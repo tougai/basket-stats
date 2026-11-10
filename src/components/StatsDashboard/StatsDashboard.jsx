@@ -49,6 +49,37 @@ export function StatsDashboard() {
     return seasonMatch && typeMatch;
   });
 
+  // Fonction de parsing robuste pour convertir les dates en timestamp
+  const parseMatchDate = (dateStr) => {
+    if (!dateStr || typeof dateStr !== 'string') return 0;
+    const trimmed = dateStr.trim();
+    if (trimmed.includes('/')) {
+      const parts = trimmed.split('/');
+      if (parts.length === 3) {
+        const day = parseInt(parts[0], 10);
+        const month = parseInt(parts[1], 10) - 1;
+        const year = parseInt(parts[2], 10);
+        const d = new Date(year, month, day);
+        if (!isNaN(d.getTime())) return d.getTime();
+      }
+    }
+    if (trimmed.includes('-')) {
+      const d = new Date(trimmed);
+      if (!isNaN(d.getTime())) return d.getTime();
+    }
+    return 0;
+  };
+
+  // Trier les matchs pour afficher les plus récents en premier (en haut de la liste)
+  const sortedMatches = [...filteredMatches].sort((a, b) => {
+    const timeA = parseMatchDate(a.date);
+    const timeB = parseMatchDate(b.date);
+    if (timeA !== timeB) {
+      return timeB - timeA; // Du plus récent au plus ancien
+    }
+    return (b.id || '').localeCompare(a.id || '');
+  });
+
   // Calcul des moyennes et KPI de saison
   const playedMatches = filteredMatches.filter(m => (m.minutes || 0) > 0 || (m.points || 0) > 0);
   const matchCount = playedMatches.length;
@@ -256,19 +287,23 @@ export function StatsDashboard() {
               Historique des Matchs
             </span>
             <span className="text-xs font-mono font-bold text-slate-400 bg-slate-800 px-2 py-0.5 rounded-full">
-              {filteredMatches.length}
+              {sortedMatches.length}
             </span>
           </div>
+
+          <span className="text-[10px] text-slate-500 font-mono">
+            Plus récents en haut ↓
+          </span>
         </div>
 
         {/* Liste */}
         <div className="space-y-2.5">
-          {filteredMatches.length === 0 ? (
+          {sortedMatches.length === 0 ? (
             <p className="text-xs text-slate-500 text-center py-6">
               Aucun match enregistré pour cette sélection.
             </p>
           ) : (
-            filteredMatches.map(m => {
+            sortedMatches.map(m => {
               const pts = parseInt(m.points) || calculatePoints(m.pts2Made, m.pts3Made, m.ftMade);
               const qs = calculateQuickScore({ ...m, points: pts });
               const cat = getCategory(qs, m.minutes);
