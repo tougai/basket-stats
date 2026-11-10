@@ -69,7 +69,7 @@ Ce projet utilise [Bun](https://bun.sh/) et [Vite](https://vite.dev/) avec React
 
 ```bash
 # 1. Cloner le dépôt
-git clone https://github.com/[votre-nom]/basket-stats.git
+git clone https://github.com/tougai/basket-stats.git
 cd basket-stats
 
 # 2. Installer les dépendances
@@ -95,10 +95,10 @@ Un fichier de workflow [GitHub Actions](.github/workflows/deploy.yml) est déjà
    git add .
    git commit -m "feat: initial release v1"
    git branch -M main
-   git remote add origin https://github.com/[votre-nom]/basket-stats.git
+   git remote add origin git@github.com:tougai/basket-stats.git
    git push -u origin main
    ```
 3. Sur GitHub, rendez-vous dans **Settings** > **Pages** :
    - Sous **Build and deployment** > **Source**, sélectionnez **GitHub Actions**.
 4. Votre application sera automatiquement accessible à l'adresse :  
-   `https://[votre-nom].github.io/basket-stats/`
+   `https://tougai.github.io/basket-stats/`
