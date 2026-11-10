@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { MatchDetailModal } from './MatchDetailModal';
+import { EditMatchModal } from './EditMatchModal';
 import { exportMatchesToExcel, exportBackupJSON } from '../../utils/exportExcel';
 import {
   calculatePoints,
@@ -8,7 +9,7 @@ import {
   getCategory,
   parseResult
 } from '../../utils/formulas';
-import { Download, Trash2, Trophy, Clock, Target, Eye, Filter, Share2 } from 'lucide-react';
+import { Download, Trash2, Trophy, Clock, Target, Eye, Filter, Share2, Pencil } from 'lucide-react';
 
 export function StatsDashboard() {
   const {
@@ -37,6 +38,7 @@ export function StatsDashboard() {
   const [selectedSeason, setSelectedSeason] = useState(availableSeasons[0] || '2026-2027');
   const [selectedType, setSelectedType] = useState('ALL');
   const [inspectMatch, setInspectMatch] = useState(null);
+  const [editingMatch, setEditingMatch] = useState(null);
   const [isAddingSeason, setIsAddingSeason] = useState(false);
   const [newSeasonInput, setNewSeasonInput] = useState('');
 
@@ -307,8 +309,19 @@ export function StatsDashboard() {
                       <span className="text-slate-400 font-mono">{m.minutes || 0} min</span>
                     </div>
 
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-1.5">
                       <span className="text-[10px] text-slate-500">{m.date}</span>
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setEditingMatch(m);
+                        }}
+                        className="text-slate-500 hover:text-orange-400 p-1 rounded-lg hover:bg-slate-800 transition"
+                        title="Modifier ce match (minutes, score, stats)"
+                      >
+                        <Pencil className="w-3.5 h-3.5" />
+                      </button>
                       <button
                         type="button"
                         onClick={(e) => {
@@ -317,7 +330,8 @@ export function StatsDashboard() {
                             deleteMatch(m.id);
                           }
                         }}
-                        className="text-slate-600 hover:text-red-400 p-1"
+                        className="text-slate-600 hover:text-red-400 p-1 rounded-lg hover:bg-slate-800 transition"
+                        title="Supprimer ce match"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>
@@ -347,6 +361,23 @@ export function StatsDashboard() {
           match={inspectMatch}
           player={activePlayer}
           onClose={() => setInspectMatch(null)}
+          onEdit={(m) => {
+            setInspectMatch(null);
+            setEditingMatch(m);
+          }}
+        />
+      )}
+
+      {/* MODAL MODIFICATION DU MATCH (TEMPS DE JEU, SCORES, STATS) */}
+      {editingMatch && (
+        <EditMatchModal
+          match={editingMatch}
+          onClose={() => setEditingMatch(null)}
+          onUpdated={(updated) => {
+            if (inspectMatch && inspectMatch.id === updated.id) {
+              setInspectMatch(updated);
+            }
+          }}
         />
       )}
     </div>

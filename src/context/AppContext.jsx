@@ -200,6 +200,20 @@ export function AppProvider({ children }) {
     setMatches(prev => prev.filter(m => m.id !== matchId));
   };
 
+  const updateMatch = (matchId, updatedData) => {
+    setMatches(prev => {
+      return prev.map(m => {
+        if (m.id === matchId) {
+          return {
+            ...m,
+            ...updatedData
+          };
+        }
+        return m;
+      });
+    });
+  };
+
   // Actions Séances de Shoot
   const saveWorkout = (workoutData) => {
     const newWorkout = {
@@ -246,6 +260,7 @@ export function AppProvider({ children }) {
         matches,
         activePlayerMatches,
         saveMatch,
+        updateMatch,
         deleteMatch,
         workouts,
         activePlayerWorkouts,

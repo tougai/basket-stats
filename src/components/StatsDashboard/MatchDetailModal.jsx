@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, Trophy, Award, Clock, Activity, Share2 } from 'lucide-react';
+import { X, Trophy, Award, Clock, Activity, Share2, Pencil } from 'lucide-react';
 import {
   calculatePoints,
   parseResult,
@@ -11,7 +11,7 @@ import {
   getCategory
 } from '../../utils/formulas';
 
-export function MatchDetailModal({ match, player, onClose }) {
+export function MatchDetailModal({ match, player, onClose, onEdit }) {
   if (!match) return null;
 
   const minutes = parseInt(match.minutes) || 0;
@@ -69,13 +69,25 @@ export function MatchDetailModal({ match, player, onClose }) {
             </div>
           </div>
 
-          <button
-            type="button"
-            onClick={onClose}
-            className="p-1.5 rounded-full hover:bg-slate-800 text-slate-400 hover:text-white"
-          >
-            <X className="w-5 h-5" />
-          </button>
+          <div className="flex items-center gap-1">
+            {onEdit && (
+              <button
+                type="button"
+                onClick={() => onEdit(match)}
+                className="p-1.5 rounded-full hover:bg-slate-800 text-slate-400 hover:text-orange-400 transition"
+                title="Modifier ce match"
+              >
+                <Pencil className="w-4 h-4" />
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={onClose}
+              className="p-1.5 rounded-full hover:bg-slate-800 text-slate-400 hover:text-white"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
         </div>
 
         {/* Tableau des 21 colonnes */}
@@ -107,14 +119,25 @@ export function MatchDetailModal({ match, player, onClose }) {
         </div>
 
         {/* Footer */}
-        <div className="mt-4 pt-3 border-t border-slate-800">
+        <div className="mt-4 pt-3 border-t border-slate-800 flex items-center gap-2 shrink-0">
           <button
             type="button"
             onClick={onClose}
-            className="w-full py-2.5 bg-slate-800 hover:bg-slate-750 text-slate-200 font-bold rounded-xl text-xs"
+            className="flex-1 py-2.5 bg-slate-800 hover:bg-slate-750 text-slate-300 font-bold rounded-xl text-xs transition"
           >
             Fermer
           </button>
+
+          {onEdit && (
+            <button
+              type="button"
+              onClick={() => onEdit(match)}
+              className="flex-1 py-2.5 bg-orange-500/20 hover:bg-orange-500/30 border border-orange-500/40 text-orange-300 font-bold rounded-xl text-xs flex items-center justify-center gap-1.5 transition"
+            >
+              <Pencil className="w-3.5 h-3.5" />
+              <span>Modifier</span>
+            </button>
+          )}
         </div>
       </div>
     </div>
