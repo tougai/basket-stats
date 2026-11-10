@@ -307,6 +307,21 @@ export function ProfileManager() {
           </button>
         </div>
 
+        {/* Guide installation PWA */}
+        <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-3 text-xs space-y-2 mt-2">
+          <div className="font-bold text-white flex items-center gap-1.5">
+            <span>📲 Installer sur votre écran d'accueil :</span>
+          </div>
+          <div className="text-slate-300 space-y-1.5 text-[11px] leading-relaxed">
+            <p>
+              <strong className="text-orange-400">🍎 Sur iPhone :</strong> Ouvrez obligatoirement le lien dans <span className="font-bold text-white">Safari</span> (pas dans Chrome ni WhatsApp). Appuyez sur le bouton <strong>Partager</strong> (carré avec flèche vers le haut), puis faites défiler vers le bas et appuyez sur <strong>« Sur l'écran d'accueil »</strong> ➕.
+            </p>
+            <p>
+              <strong className="text-emerald-400">🤖 Sur Android :</strong> Dans <strong>Chrome</strong>, appuyez sur les 3 points en haut à droite $\rightarrow$ <strong>« Installer l'application »</strong>.
+            </p>
+          </div>
+        </div>
+
         {/* Import JSON */}
         <div className="border-t border-slate-800/80 pt-2.5 flex items-center justify-between text-xs text-slate-400">
           <span>Restaurer une sauvegarde :</span>

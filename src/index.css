@@ -4,6 +4,7 @@
   * {
     -webkit-tap-highlight-color: transparent;
     user-select: none;
+    box-sizing: border-box;
   }
   
   input, textarea, select {
@@ -15,6 +16,24 @@
     color: #F3F4F6;
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
     overscroll-behavior-y: none;
+  }
+
+  /* Style natif pour le sélecteur de date sur smartphone */
+  input[type="date"] {
+    color-scheme: dark;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    min-width: 0;
+    max-width: 100%;
+    display: block;
+  }
+
+  input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(0.8);
+    cursor: pointer;
+    margin-left: 4px;
+    padding: 0;
   }
 }
 

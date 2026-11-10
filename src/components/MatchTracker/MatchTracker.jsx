@@ -232,38 +232,36 @@ export function MatchTracker({ onNavigateToStats }) {
           </span>
         </div>
 
-        {/* Adversaire & Date */}
-        <div className="grid grid-cols-2 gap-2.5">
-          <div>
-            <label className="text-[10px] font-bold uppercase text-slate-400 tracking-wider block mb-1">
-              Adversaire *
-            </label>
-            <input
-              type="text"
-              placeholder="Ex: St Jory, Lavaur..."
-              value={matchData.opponent}
-              onChange={(e) => updateField('opponent', e.target.value)}
-              className="w-full bg-slate-900 border border-slate-750 focus:border-orange-500 rounded-xl px-3 py-2 text-sm font-semibold text-white placeholder-slate-500 outline-none transition"
-            />
-          </div>
+        {/* Adversaire (Pleine largeur pour les noms longs) */}
+        <div>
+          <label className="text-[10px] font-bold uppercase text-slate-400 tracking-wider block mb-1">
+            Adversaire *
+          </label>
+          <input
+            type="text"
+            placeholder="Ex: St Jory, Lavaur, Quinte Fontsgrive..."
+            value={matchData.opponent}
+            onChange={(e) => updateField('opponent', e.target.value)}
+            className="w-full bg-slate-900 border border-slate-750 focus:border-orange-500 rounded-xl px-3 py-2 text-sm font-semibold text-white placeholder-slate-500 outline-none transition"
+          />
+        </div>
 
-          <div>
-            <label className="text-[10px] font-bold uppercase text-slate-400 tracking-wider block mb-1">
+        {/* Date & Type de match (avec min-w-0 et overflow-hidden anti-débordement) */}
+        <div className="grid grid-cols-2 gap-2.5 min-w-0">
+          <div className="min-w-0 overflow-hidden">
+            <label className="text-[10px] font-bold uppercase text-slate-400 tracking-wider block mb-1 truncate">
               Date
             </label>
             <input
               type="date"
               value={matchData.date}
               onChange={(e) => updateField('date', e.target.value)}
-              className="w-full bg-slate-900 border border-slate-750 focus:border-orange-500 rounded-xl px-3 py-2 text-sm font-semibold text-white outline-none transition"
+              className="w-full min-w-0 max-w-full box-border bg-slate-900 border border-slate-750 focus:border-orange-500 rounded-xl px-2 py-2 text-xs font-semibold text-white outline-none transition"
             />
           </div>
-        </div>
 
-        {/* Type de match & Durée match */}
-        <div className="grid grid-cols-2 gap-2.5">
-          <div>
-            <label className="text-[10px] font-bold uppercase text-slate-400 tracking-wider block mb-1">
+          <div className="min-w-0 overflow-hidden">
+            <label className="text-[10px] font-bold uppercase text-slate-400 tracking-wider block mb-1 truncate">
               Type de match
             </label>
             <select
@@ -275,7 +273,7 @@ export function MatchTracker({ onNavigateToStats }) {
                   updateField('type', e.target.value);
                 }
               }}
-              className="w-full bg-slate-900 border border-slate-750 focus:border-orange-500 rounded-xl px-2.5 py-2 text-xs font-medium text-white outline-none"
+              className="w-full min-w-0 max-w-full box-border bg-slate-900 border border-slate-750 focus:border-orange-500 rounded-xl px-2 py-2 text-xs font-medium text-white outline-none truncate"
             >
               {matchTypes.map(t => (
                 <option key={t} value={t}>{t}</option>
@@ -283,21 +281,22 @@ export function MatchTracker({ onNavigateToStats }) {
               <option value="__add_new__">+ Ajouter un type...</option>
             </select>
           </div>
+        </div>
 
-          <div>
-            <label className="text-[10px] font-bold uppercase text-slate-400 tracking-wider block mb-1">
-              Format Match
-            </label>
-            <select
-              value={matchData.matchDuration}
-              onChange={(e) => updateField('matchDuration', parseInt(e.target.value))}
-              className="w-full bg-slate-900 border border-slate-750 focus:border-orange-500 rounded-xl px-2.5 py-2 text-xs font-medium text-white outline-none"
-            >
-              <option value={40}>40 min (Standard / 4x10)</option>
-              <option value={32}>32 min (Jeunes / 4x8)</option>
-              <option value={20}>20 min (Tournoi / 2x10)</option>
-            </select>
-          </div>
+        {/* Format Match */}
+        <div>
+          <label className="text-[10px] font-bold uppercase text-slate-400 tracking-wider block mb-1">
+            Format Match (Durée)
+          </label>
+          <select
+            value={matchData.matchDuration}
+            onChange={(e) => updateField('matchDuration', parseInt(e.target.value))}
+            className="w-full min-w-0 bg-slate-900 border border-slate-750 focus:border-orange-500 rounded-xl px-2.5 py-2 text-xs font-medium text-white outline-none"
+          >
+            <option value={40}>40 min (Standard / 4x10 min)</option>
+            <option value={32}>32 min (Jeunes U15/U13 / 4x8 min)</option>
+            <option value={20}>20 min (Tournoi / 2x10 min)</option>
+          </select>
         </div>
 
         {/* Formulaire ajout type personnalisé */}
