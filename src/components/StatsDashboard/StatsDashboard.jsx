@@ -18,21 +18,27 @@ export function StatsDashboard() {
     deleteMatch,
     players,
     matches,
-    workouts
+    workouts,
+    seasons,
+    addSeason,
+    currentSeason
   } = useApp();
 
-  const [selectedSeason, setSelectedSeason] = useState('2025-2026');
-  const [selectedType, setSelectedType] = useState('ALL');
-  const [inspectMatch, setInspectMatch] = useState(null);
-
-  // Extraire les saisons disponibles
+  // Liste de toutes les saisons disponibles (triées de la plus récente à la plus ancienne)
   const availableSeasons = Array.from(
-    new Set(activePlayerMatches.map(m => m.season).filter(Boolean))
+    new Set([...(seasons || []), ...activePlayerMatches.map(m => m.season).filter(Boolean)])
   ).sort().reverse();
 
   if (availableSeasons.length === 0) {
-    availableSeasons.push('2025-2026');
+    availableSeasons.push('2026-2027');
   }
+
+  // Par défaut : la dernière saison (ou saison en cours)
+  const [selectedSeason, setSelectedSeason] = useState(availableSeasons[0] || '2026-2027');
+  const [selectedType, setSelectedType] = useState('ALL');
+  const [inspectMatch, setInspectMatch] = useState(null);
+  const [isAddingSeason, setIsAddingSeason] = useState(false);
+  const [newSeasonInput, setNewSeasonInput] = useState('');
 
   // Filtrer les matchs selon la saison et le type
   const filteredMatches = activePlayerMatches.filter(m => {
@@ -106,6 +112,21 @@ export function StatsDashboard() {
 
         {/* Pilules de saisons */}
         <div className="flex items-center gap-1.5 overflow-x-auto pb-1 text-xs">
+          {availableSeasons.map(s => (
+            <button
+              key={s}
+              type="button"
+              onClick={() => setSelectedSeason(s)}
+              className={`px-3 py-1.5 rounded-xl font-bold transition whitespace-nowrap ${
+                selectedSeason === s
+                  ? 'bg-orange-500 text-white shadow-md'
+                  : 'bg-slate-900 text-slate-300 hover:text-white border border-slate-800'
+              }`}
+            >
+              {s}
+            </button>
+          ))}
+
           <button
             type="button"
             onClick={() => setSelectedSeason('ALL')}
@@ -115,23 +136,58 @@ export function StatsDashboard() {
                 : 'bg-slate-900 text-slate-400 hover:text-white border border-slate-800'
             }`}
           >
-            Toutes les saisons
+            Toutes
           </button>
-          {availableSeasons.map(s => (
-            <button
-              key={s}
-              type="button"
-              onClick={() => setSelectedSeason(s)}
-              className={`px-3 py-1.5 rounded-xl font-bold transition whitespace-nowrap ${
-                selectedSeason === s
-                  ? 'bg-orange-500 text-white shadow-md'
-                  : 'bg-slate-900 text-slate-400 hover:text-white border border-slate-800'
-              }`}
-            >
-              {s}
-            </button>
-          ))}
+
+          {/* Bouton ajouter une nouvelle saison */}
+          <button
+            type="button"
+            onClick={() => setIsAddingSeason(true)}
+            className="px-2.5 py-1.5 rounded-xl font-bold bg-slate-800 hover:bg-slate-700 text-orange-400 border border-slate-700 flex items-center gap-1 whitespace-nowrap active:scale-95 transition"
+            title="Créer une nouvelle saison"
+          >
+            <span>+</span>
+            <span>Saison</span>
+          </button>
         </div>
+
+        {/* Input d'ajout d'une nouvelle saison */}
+        {isAddingSeason && (
+          <div className="flex items-center gap-2 p-2.5 bg-slate-900 rounded-2xl border border-orange-500/40 animate-in fade-in duration-150">
+            <input
+              type="text"
+              autoFocus
+              placeholder="Ex: 2027-2028"
+              value={newSeasonInput}
+              onChange={(e) => setNewSeasonInput(e.target.value)}
+              className="flex-1 bg-transparent text-xs font-bold text-white placeholder-slate-500 outline-none px-2"
+            />
+            <button
+              type="button"
+              onClick={() => {
+                if (newSeasonInput.trim()) {
+                  addSeason(newSeasonInput.trim());
+                  setSelectedSeason(newSeasonInput.trim());
+                  setNewSeasonInput('');
+                  setIsAddingSeason(false);
+                }
+              }}
+              className="px-3 py-1 bg-gradient-to-r from-orange-500 to-amber-500 text-white text-xs font-extrabold rounded-lg shadow-sm"
+            >
+              Créer
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setIsAddingSeason(false);
+                setNewSeasonInput('');
+              }}
+              className="text-xs text-slate-400 hover:text-white px-1.5"
+            >
+              Annuler
+            </button>
+          </div>
+        )}
       </div>
 
       {/* 2. GRILLE KPI MOYENNES DE SAISON */}

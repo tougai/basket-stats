@@ -18,7 +18,10 @@ const DEFAULT_MATCH_TYPES = [
 ];
 
 export function MatchTracker({ onNavigateToStats }) {
-  const { activePlayer, currentSeason, saveMatch, matchDraft, setMatchDraft } = useApp();
+  const { activePlayer, currentSeason, seasons, addSeason, saveMatch, matchDraft, setMatchDraft } = useApp();
+
+  const [isAddingNewSeason, setIsAddingNewSeason] = useState(false);
+  const [newSeasonInput, setNewSeasonInput] = useState('');
 
   // Initialisation à partir du brouillon ou valeurs par défaut
   const [matchData, setMatchData] = useState(() => {
@@ -27,7 +30,7 @@ export function MatchTracker({ onNavigateToStats }) {
     }
     return {
       date: new Date().toISOString().slice(0, 10),
-      season: currentSeason,
+      season: currentSeason || '2026-2027',
       type: 'saison reg (dom)',
       opponent: '',
       teamScore: '',
@@ -246,8 +249,30 @@ export function MatchTracker({ onNavigateToStats }) {
           />
         </div>
 
-        {/* Date & Type de match (avec min-w-0 et overflow-hidden anti-débordement) */}
+        {/* Saison & Date (avec min-w-0 anti-débordement) */}
         <div className="grid grid-cols-2 gap-2.5 min-w-0">
+          <div className="min-w-0 overflow-hidden">
+            <label className="text-[10px] font-bold uppercase text-slate-400 tracking-wider block mb-1 truncate">
+              Saison
+            </label>
+            <select
+              value={matchData.season}
+              onChange={(e) => {
+                if (e.target.value === '__add_season__') {
+                  setIsAddingNewSeason(true);
+                } else {
+                  updateField('season', e.target.value);
+                }
+              }}
+              className="w-full min-w-0 max-w-full box-border bg-slate-900 border border-slate-750 focus:border-orange-500 rounded-xl px-2 py-2 text-xs font-semibold text-white outline-none truncate"
+            >
+              {(seasons || [currentSeason]).map(s => (
+                <option key={s} value={s}>{s}</option>
+              ))}
+              <option value="__add_season__">+ Nouvelle saison...</option>
+            </select>
+          </div>
+
           <div className="min-w-0 overflow-hidden">
             <label className="text-[10px] font-bold uppercase text-slate-400 tracking-wider block mb-1 truncate">
               Date
@@ -259,7 +284,48 @@ export function MatchTracker({ onNavigateToStats }) {
               className="w-full min-w-0 max-w-full box-border bg-slate-900 border border-slate-750 focus:border-orange-500 rounded-xl px-2 py-2 text-xs font-semibold text-white outline-none transition"
             />
           </div>
+        </div>
 
+        {/* Formulaire ajout nouvelle saison dans Match */}
+        {isAddingNewSeason && (
+          <div className="flex items-center gap-2 p-2 bg-slate-900 rounded-xl border border-orange-500/40 animate-in fade-in duration-150">
+            <input
+              type="text"
+              autoFocus
+              placeholder="Ex: 2027-2028"
+              value={newSeasonInput}
+              onChange={(e) => setNewSeasonInput(e.target.value)}
+              className="flex-1 bg-transparent text-xs font-bold text-white placeholder-slate-500 outline-none px-2"
+            />
+            <button
+              type="button"
+              onClick={() => {
+                if (newSeasonInput.trim()) {
+                  addSeason(newSeasonInput.trim());
+                  updateField('season', newSeasonInput.trim());
+                  setNewSeasonInput('');
+                  setIsAddingNewSeason(false);
+                }
+              }}
+              className="px-2.5 py-1 bg-orange-500 text-white text-xs font-bold rounded-lg"
+            >
+              OK
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setIsAddingNewSeason(false);
+                setNewSeasonInput('');
+              }}
+              className="text-xs text-slate-400 px-1"
+            >
+              ✕
+            </button>
+          </div>
+        )}
+
+        {/* Type de match & Format Durée */}
+        <div className="grid grid-cols-2 gap-2.5 min-w-0">
           <div className="min-w-0 overflow-hidden">
             <label className="text-[10px] font-bold uppercase text-slate-400 tracking-wider block mb-1 truncate">
               Type de match
@@ -281,22 +347,21 @@ export function MatchTracker({ onNavigateToStats }) {
               <option value="__add_new__">+ Ajouter un type...</option>
             </select>
           </div>
-        </div>
 
-        {/* Format Match */}
-        <div>
-          <label className="text-[10px] font-bold uppercase text-slate-400 tracking-wider block mb-1">
-            Format Match (Durée)
-          </label>
-          <select
-            value={matchData.matchDuration}
-            onChange={(e) => updateField('matchDuration', parseInt(e.target.value))}
-            className="w-full min-w-0 bg-slate-900 border border-slate-750 focus:border-orange-500 rounded-xl px-2.5 py-2 text-xs font-medium text-white outline-none"
-          >
-            <option value={40}>40 min (Standard / 4x10 min)</option>
-            <option value={32}>32 min (Jeunes U15/U13 / 4x8 min)</option>
-            <option value={20}>20 min (Tournoi / 2x10 min)</option>
-          </select>
+          <div className="min-w-0 overflow-hidden">
+            <label className="text-[10px] font-bold uppercase text-slate-400 tracking-wider block mb-1 truncate">
+              Format Match
+            </label>
+            <select
+              value={matchData.matchDuration}
+              onChange={(e) => updateField('matchDuration', parseInt(e.target.value))}
+              className="w-full min-w-0 max-w-full box-border bg-slate-900 border border-slate-750 focus:border-orange-500 rounded-xl px-2 py-2 text-xs font-medium text-white outline-none"
+            >
+              <option value={40}>40 min (Standard)</option>
+              <option value={32}>32 min (Jeunes U15/U13)</option>
+              <option value={20}>20 min (Tournoi)</option>
+            </select>
+          </div>
         </div>
 
         {/* Formulaire ajout type personnalisé */}

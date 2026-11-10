@@ -29,30 +29,35 @@ export function Header({ onOpenProfileModal }) {
 
         {/* Sélecteur de joueur (Fratries) & Saison */}
         <div className="flex items-center gap-2">
+          {/* Badge Saison active */}
+          <span className="hidden sm:inline-block text-[11px] font-mono font-bold text-slate-300 bg-slate-800 border border-slate-700 px-2 py-1 rounded-full">
+            {currentSeason}
+          </span>
+
           {/* Menu déroulant Fratries */}
           <div className="relative">
             <button
               onClick={() => setShowPlayerDropdown(!showPlayerDropdown)}
-              className="flex items-center gap-1.5 bg-slate-800/90 hover:bg-slate-750 border border-slate-700/80 rounded-full py-1.5 px-3 transition active:scale-95"
+              className="flex items-center gap-1.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-full py-1.5 px-3 transition active:scale-95 shadow-sm"
             >
-              <div className="w-5 h-5 rounded-full bg-gradient-to-br from-orange-500 to-amber-600 flex items-center justify-center text-[10px] font-bold text-white">
+              <div className="w-5 h-5 rounded-full bg-gradient-to-br from-orange-500 to-amber-600 flex items-center justify-center text-[10px] font-bold text-white shadow-sm">
                 {activePlayer.name?.[0]?.toUpperCase() || 'J'}
               </div>
-              <span className="text-xs font-semibold text-slate-200 max-w-[75px] truncate">
+              <span className="text-xs font-bold text-white max-w-[80px] truncate">
                 {activePlayer.name}
               </span>
               <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
             </button>
 
-            {/* Menu Joueurs */}
+            {/* Menu Joueurs - 100% Opaque et lisible */}
             {showPlayerDropdown && (
               <>
                 <div
                   className="fixed inset-0 z-30"
                   onClick={() => setShowPlayerDropdown(false)}
                 />
-                <div className="absolute right-0 mt-2 w-56 bg-slate-850 border border-slate-700/90 rounded-2xl shadow-2xl p-2 z-40 animate-in fade-in zoom-in-95 duration-150">
-                  <div className="px-2.5 py-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                <div className="absolute right-0 mt-2 w-60 bg-slate-900 border-2 border-slate-700 rounded-2xl shadow-2xl p-2.5 z-40 animate-in fade-in zoom-in-95 duration-150 ring-1 ring-black">
+                  <div className="px-2.5 py-1.5 text-[10px] font-extrabold uppercase tracking-wider text-slate-400 border-b border-slate-800 mb-1.5">
                     Changer de joueur (Fratries)
                   </div>
                   <div className="space-y-1">
@@ -65,17 +70,17 @@ export function Header({ onOpenProfileModal }) {
                         }}
                         className={`w-full flex items-center justify-between p-2 rounded-xl text-xs transition ${
                           p.id === activePlayer.id
-                            ? 'bg-orange-500/15 text-orange-400 font-bold border border-orange-500/30'
-                            : 'hover:bg-slate-800 text-slate-300'
+                            ? 'bg-orange-500/20 text-orange-400 font-bold border border-orange-500/40'
+                            : 'hover:bg-slate-800 text-slate-200'
                         }`}
                       >
-                        <div className="flex items-center gap-2 truncate">
-                          <div className="w-6 h-6 rounded-full bg-slate-750 flex items-center justify-center font-bold text-[11px] text-white">
+                        <div className="flex items-center gap-2.5 truncate">
+                          <div className="w-7 h-7 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center font-mono font-bold text-[11px] text-white shrink-0">
                             #{p.jerseyNumber || '?'}
                           </div>
                           <div className="text-left truncate">
-                            <div className="truncate font-semibold">{p.name}</div>
-                            <div className="text-[10px] text-slate-400">{p.team || 'U15'}</div>
+                            <div className="truncate font-bold text-white">{p.name}</div>
+                            <div className="text-[10px] text-slate-400">{p.team || 'U15'} • {p.club || 'Club'}</div>
                           </div>
                         </div>
                         {p.id === activePlayer.id && (
@@ -85,16 +90,16 @@ export function Header({ onOpenProfileModal }) {
                     ))}
                   </div>
 
-                  <div className="border-t border-slate-750 mt-1.5 pt-1.5">
+                  <div className="border-t border-slate-800 mt-2 pt-1.5">
                     <button
                       onClick={() => {
                         setShowPlayerDropdown(false);
                         onOpenProfileModal();
                       }}
-                      className="w-full flex items-center gap-2 p-2 rounded-xl text-xs text-orange-400 hover:bg-orange-500/10 transition font-medium"
+                      className="w-full flex items-center gap-2 p-2 rounded-xl text-xs text-orange-400 hover:bg-orange-500/15 transition font-bold"
                     >
                       <UserPlus className="w-3.5 h-3.5" />
-                      <span>Ajouter un joueur (Fratrie)</span>
+                      <span>Ajouter un enfant (Fratrie)</span>
                     </button>
                   </div>
                 </div>

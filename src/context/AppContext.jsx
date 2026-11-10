@@ -8,6 +8,7 @@ const STORAGE_KEY_MATCHES = 'basket_stats_matches_v1';
 const STORAGE_KEY_WORKOUTS = 'basket_stats_workouts_v1';
 const STORAGE_KEY_ACTIVE_PLAYER = 'basket_stats_active_player_v1';
 const STORAGE_KEY_DRAFT = 'basket_stats_match_draft_v1';
+const STORAGE_KEY_SEASONS = 'basket_stats_seasons_v1';
 
 export function AppProvider({ children }) {
   // 1. Initialiser la liste des joueurs
@@ -54,8 +55,22 @@ export function AppProvider({ children }) {
     return initialData.workouts || [];
   });
 
-  // 5. Saison courante
-  const [currentSeason, setCurrentSeason] = useState('2025-2026');
+  // 5. Gestion des saisons (liste dynamique et saison courante)
+  const [seasons, setSeasons] = useState(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY_SEASONS);
+      if (saved) return JSON.parse(saved);
+    } catch (e) {}
+
+    // Récupérer toutes les saisons existantes dans les données
+    const matchSeasons = Array.from(new Set((initialData.matches || []).map(m => m.season).filter(Boolean)));
+    const merged = Array.from(new Set(['2026-2027', '2025-2026', ...matchSeasons])).sort().reverse();
+    return merged;
+  });
+
+  const [currentSeason, setCurrentSeason] = useState(() => {
+    return seasons[0] || '2026-2027';
+  });
 
   // 6. Brouillon du match en direct (pour reprise immédiate sans perte)
   const [matchDraft, setMatchDraft] = useState(() => {
@@ -72,6 +87,21 @@ export function AppProvider({ children }) {
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY_PLAYERS, JSON.stringify(players));
   }, [players]);
+
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEY_SEASONS, JSON.stringify(seasons));
+  }, [seasons]);
+
+  const addSeason = (newSeason) => {
+    if (!newSeason || typeof newSeason !== 'string') return;
+    const clean = newSeason.trim();
+    if (!clean) return;
+    setSeasons(prev => {
+      const updated = Array.from(new Set([clean, ...prev])).sort().reverse();
+      return updated;
+    });
+    setCurrentSeason(clean);
+  };
 
   useEffect(() => {
     if (activePlayerId) {
@@ -223,6 +253,8 @@ export function AppProvider({ children }) {
         deleteWorkout,
         currentSeason,
         setCurrentSeason,
+        seasons,
+        addSeason,
         matchDraft,
         setMatchDraft,
         importBackupData
