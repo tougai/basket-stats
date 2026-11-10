@@ -1,7 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useApp } from '../../context/AppContext';
-import { UserPlus, Edit3, Trash2, Check, Upload, Share2, QrCode, Shield, Award, Users } from 'lucide-react';
+import { UserPlus, Edit3, Trash2, Check, Upload, Share2, QrCode, Shield, Award, Users, Copy, CheckCheck, X } from 'lucide-react';
 import { exportBackupJSON } from '../../utils/exportExcel';
+import QRCode from 'qrcode';
+
+const PUBLIC_APP_URL = 'https://tougai.github.io/basket-stats/';
 
 export function ProfileManager() {
   const {
@@ -19,6 +22,25 @@ export function ProfileManager() {
 
   const [isEditing, setIsEditing] = useState(false);
   const [editingPlayerId, setEditingPlayerId] = useState(null);
+  const [showQrModal, setShowQrModal] = useState(false);
+  const [qrCodeDataUrl, setQrCodeDataUrl] = useState('');
+  const [copied, setCopied] = useState(false);
+
+  // Déterminer l'URL publique officielle
+  const shareUrl = typeof window !== 'undefined' && !window.location.origin.includes('localhost')
+    ? window.location.href
+    : PUBLIC_APP_URL;
+
+  useEffect(() => {
+    QRCode.toDataURL(shareUrl, {
+      width: 280,
+      margin: 2,
+      color: { dark: '#0F172A', light: '#FFFFFF' }
+    })
+      .then(url => setQrCodeDataUrl(url))
+      .catch(err => console.error(err));
+  }, [shareUrl]);
+
   const [formData, setFormData] = useState({
     name: '',
     fullName: '',
@@ -28,8 +50,6 @@ export function ProfileManager() {
     position: 'Meneur / Arrière',
     dominantHand: 'Droitier'
   });
-
-  const [showShareModal, setShowShareModal] = useState(false);
 
   const openAddForm = () => {
     setFormData({
@@ -203,9 +223,13 @@ export function ProfileManager() {
           <div className="flex items-center gap-2">
             <Share2 className="w-4 h-4 text-orange-400" />
             <h3 className="text-xs font-bold uppercase tracking-wider text-white">
-              Partager avec d'autres parents
+              Partager l'application
             </h3>
           </div>
+
+          <span className="text-[10px] text-emerald-400 font-bold bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-full">
+            Lien Officiel
+          </span>
         </div>
 
         <p className="text-xs text-slate-400 leading-relaxed">
@@ -213,34 +237,73 @@ export function ProfileManager() {
           Partagez le lien avec les autres parents de l'équipe pour qu'ils puissent suivre leurs propres enfants au gymnase !
         </p>
 
-        <div className="flex items-center gap-2 pt-1">
+        {/* Affichage direct de l'URL avec bouton Copier */}
+        <div className="flex items-center gap-2 bg-slate-900 border border-slate-800 rounded-2xl p-1.5 px-3">
+          <span className="text-xs font-mono text-slate-300 truncate flex-1 select-all">
+            {shareUrl}
+          </span>
+          <button
+            type="button"
+            onClick={() => {
+              navigator.clipboard.writeText(shareUrl);
+              setCopied(true);
+              setTimeout(() => setCopied(false), 2000);
+            }}
+            className="flex items-center gap-1 px-2.5 py-1.5 bg-slate-800 hover:bg-slate-750 active:scale-95 text-slate-200 rounded-xl text-xs font-bold border border-slate-700 transition"
+          >
+            {copied ? (
+              <>
+                <CheckCheck className="w-3.5 h-3.5 text-emerald-400" />
+                <span className="text-emerald-400">Copié !</span>
+              </>
+            ) : (
+              <>
+                <Copy className="w-3.5 h-3.5" />
+                <span>Copier</span>
+              </>
+            )}
+          </button>
+        </div>
+
+        {/* Boutons d'action : Partager + QR Code + Export JSON */}
+        <div className="grid grid-cols-3 gap-2 pt-1">
           <button
             type="button"
             onClick={() => {
               if (navigator.share) {
                 navigator.share({
-                  title: 'Basket Stats Tracker',
+                  title: 'Basket Stats Pro',
                   text: 'Suivi des statistiques et tirs de basket pour enfants au gymnase !',
-                  url: window.location.href
+                  url: shareUrl
                 }).catch(() => {});
               } else {
-                navigator.clipboard.writeText(window.location.href);
-                alert('Lien de l\'application copié dans le presse-papier !');
+                navigator.clipboard.writeText(shareUrl);
+                setCopied(true);
+                setTimeout(() => setCopied(false), 2000);
               }
             }}
-            className="flex-1 py-2.5 bg-slate-800 hover:bg-slate-750 active:scale-95 text-slate-200 font-bold text-xs rounded-xl border border-slate-700 flex items-center justify-center gap-2 transition"
+            className="py-2.5 bg-gradient-to-r from-orange-500 to-amber-600 active:scale-95 text-white font-extrabold text-xs rounded-xl shadow-md shadow-orange-500/20 flex items-center justify-center gap-1.5 transition"
           >
-            <Share2 className="w-3.5 h-3.5 text-orange-400" />
-            <span>Partager le lien</span>
+            <Share2 className="w-3.5 h-3.5" />
+            <span>Partager</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setShowQrModal(true)}
+            className="py-2.5 bg-slate-800 hover:bg-slate-750 active:scale-95 text-slate-200 font-bold text-xs rounded-xl border border-slate-700 flex items-center justify-center gap-1.5 transition"
+          >
+            <QrCode className="w-3.5 h-3.5 text-orange-400" />
+            <span>QR Code</span>
           </button>
 
           <button
             type="button"
             onClick={() => exportBackupJSON({ players, matches, workouts })}
-            className="px-3.5 py-2.5 bg-slate-800 hover:bg-slate-750 active:scale-95 text-slate-300 font-bold text-xs rounded-xl border border-slate-700"
+            className="py-2.5 bg-slate-800 hover:bg-slate-750 active:scale-95 text-slate-300 font-bold text-xs rounded-xl border border-slate-700 flex items-center justify-center gap-1.5 transition"
             title="Exporter Sauvegarde JSON"
           >
-            Export JSON
+            <span>Backup</span>
           </button>
         </div>
 
@@ -259,6 +322,55 @@ export function ProfileManager() {
           </label>
         </div>
       </div>
+
+      {/* MODAL QR CODE À FLASHER AU GYMNASE */}
+      {showQrModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-md animate-in fade-in duration-200">
+          <div className="bg-slate-900 border border-slate-750 w-full max-w-sm rounded-3xl p-6 text-center shadow-2xl relative">
+            <button
+              type="button"
+              onClick={() => setShowQrModal(false)}
+              className="absolute top-4 right-4 p-1.5 rounded-full hover:bg-slate-800 text-slate-400 hover:text-white"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            <div className="w-12 h-12 rounded-2xl bg-orange-500/15 border border-orange-500/30 flex items-center justify-center mx-auto mb-3 text-orange-400">
+              <QrCode className="w-6 h-6" />
+            </div>
+
+            <h3 className="text-base font-black text-white">
+              Flasher pour ouvrir l'application
+            </h3>
+            <p className="text-xs text-slate-400 mt-1 mb-4">
+              Pointez l'appareil photo du smartphone d'un parent pour ouvrir directement l'application !
+            </p>
+
+            {/* Image QR Code générée */}
+            {qrCodeDataUrl ? (
+              <div className="bg-white p-4 rounded-2xl inline-block mx-auto shadow-xl">
+                <img src={qrCodeDataUrl} alt="QR Code" className="w-56 h-56 mx-auto" />
+              </div>
+            ) : (
+              <div className="w-56 h-56 bg-slate-800 animate-pulse rounded-2xl mx-auto flex items-center justify-center text-xs text-slate-500">
+                Génération...
+              </div>
+            )}
+
+            <div className="text-[11px] font-mono text-slate-400 mt-4 break-all bg-slate-850 p-2 rounded-xl border border-slate-800 select-all">
+              {shareUrl}
+            </div>
+
+            <button
+              type="button"
+              onClick={() => setShowQrModal(false)}
+              className="w-full mt-4 py-3 bg-slate-800 hover:bg-slate-750 text-slate-200 font-bold rounded-2xl text-xs border border-slate-700"
+            >
+              Fermer
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* FORMULAIRE MODAL AJOUT / MODIFICATION JOUEUR */}
       {isEditing && (
