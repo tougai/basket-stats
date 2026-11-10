@@ -1,12 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useApp } from '../../context/AppContext';
-import { GameTimer } from './GameTimer';
-import { StatKeypad } from './StatKeypad';
-import { LiveSummaryBar } from './LiveSummaryBar';
 import { MatchSuccessModal } from './MatchSuccessModal';
 import { LiveSingleScreen } from './LiveSingleScreen';
 import { calculatePoints, calculateQuickScore, calculateEfficiency, calculateValeurAjoutee } from '../../utils/formulas';
-import { Save, Calendar, Shield, Swords, Plus, RotateCcw, Award, Sparkles, Maximize2 } from 'lucide-react';
+import { RotateCcw, Sparkles, Maximize2, Play, Users, Calendar } from 'lucide-react';
 
 const DEFAULT_MATCH_TYPES = [
   'brassages region',
@@ -148,10 +145,7 @@ export function MatchTracker({ onNavigateToStats }) {
 
   // Enregistrer le match
   const handleSaveMatch = () => {
-    if (!matchData.opponent.trim()) {
-      alert('Veuillez renseigner le nom de l\'adversaire.');
-      return;
-    }
+    const oppName = matchData.opponent.trim() || 'Adversaire';
 
     const calculatedPts = calculatePoints(matchData.pts2Made, matchData.pts3Made, matchData.ftMade);
     const finalMinutes = minutes;
@@ -160,7 +154,7 @@ export function MatchTracker({ onNavigateToStats }) {
       date: matchData.date.split('-').reverse().join('/'),
       season: matchData.season || currentSeason,
       type: matchData.type,
-      opponent: matchData.opponent.trim(),
+      opponent: oppName,
       result: formattedResult || 'Score non renseigné',
       minutes: finalMinutes,
       points: calculatedPts,
@@ -209,7 +203,7 @@ export function MatchTracker({ onNavigateToStats }) {
   };
 
   const handleResetMatch = () => {
-    if (window.confirm('Réinitialiser la feuille de match en cours ? Les compteurs seront remis à zéro.')) {
+    if (window.confirm('Réinitialiser la feuille de match en cours ? Tous les compteurs seront remis à zéro.')) {
       setMatchData({
         date: new Date().toISOString().slice(0, 10),
         season: currentSeason,
@@ -270,49 +264,70 @@ export function MatchTracker({ onNavigateToStats }) {
     );
   }
 
+  // A-t-on un match avec des statistiques déjà saisies en cours ?
+  const hasLiveDraft = (points > 0 || matchData.timerSeconds > 0 || (matchData.undoStack && matchData.undoStack.length > 0));
+
   return (
     <div className="space-y-4 pb-24 max-w-md mx-auto">
-      {/* BOUTON D'ACCÈS AU MODE DIRECT PLEIN ÉCRAN */}
-      <button
-        type="button"
-        onClick={() => setIsLiveMode(true)}
-        className="w-full py-4 bg-gradient-to-r from-orange-500 via-amber-500 to-orange-600 active:scale-98 text-white font-black text-sm uppercase tracking-wider rounded-3xl shadow-xl shadow-orange-500/25 flex items-center justify-center gap-2.5 transition"
-      >
-        <Sparkles className="w-5 h-5 animate-pulse text-amber-200" />
-        <span>Lancer le Mode Direct (1 Seule Page)</span>
-        <Maximize2 className="w-4 h-4 ml-1 opacity-80" />
-      </button>
-
-      {/* 1. FICHE CONTEXTE DU MATCH */}
-      <div className="bg-slate-850/80 border border-slate-750 p-4 rounded-3xl shadow-sm space-y-3">
-        <div className="flex items-center justify-between border-b border-slate-800 pb-2">
+      {/* FICHE ÉPURÉE DE PRÉPARATION DU MATCH (OPTION A) */}
+      <div className="bg-slate-850/90 border border-slate-750 p-5 rounded-3xl shadow-xl space-y-4">
+        
+        {/* En-tête : Joueur sélectionné */}
+        <div className="flex items-center justify-between border-b border-slate-800 pb-3">
           <div className="flex items-center gap-2">
-            <span className="w-2.5 h-2.5 rounded-full bg-orange-500"></span>
-            <span className="text-xs font-bold uppercase tracking-wider text-white">
-              Contexte du Match
-            </span>
+            <span className="w-3 h-3 rounded-full bg-orange-500 animate-pulse"></span>
+            <div>
+              <h2 className="text-sm font-black uppercase tracking-wider text-white">
+                {hasLiveDraft ? 'Match en Cours' : 'Préparation du Match'}
+              </h2>
+              <p className="text-[11px] text-slate-400">
+                {hasLiveDraft ? 'Session active prête à être reprise' : 'Préparez les détails puis lancez le direct'}
+              </p>
+            </div>
           </div>
 
-          <span className="text-[11px] font-mono text-orange-400 bg-orange-500/10 px-2.5 py-0.5 rounded-full border border-orange-500/20">
+          <span className="text-xs font-mono font-bold text-orange-400 bg-orange-500/10 px-3 py-1 rounded-full border border-orange-500/20">
             {activePlayer.name} (#{activePlayer.jerseyNumber || '?'})
           </span>
         </div>
 
-        {/* Adversaire (Pleine largeur pour les noms longs) */}
+        {/* Bannière de reprise si match déjà en cours */}
+        {hasLiveDraft && (
+          <div className="bg-gradient-to-r from-orange-500/15 via-amber-500/15 to-transparent border border-orange-500/30 rounded-2xl p-3 flex items-center justify-between">
+            <div>
+              <div className="text-xs font-black text-amber-300">
+                {matchData.opponent || 'Match Direct'}
+              </div>
+              <div className="text-[11px] font-mono text-slate-300">
+                {points} pts • {minutes} min de jeu • {matchData.pf}/5 fautes
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={() => setIsLiveMode(true)}
+              className="px-3.5 py-2 bg-orange-500 hover:bg-orange-600 active:scale-95 text-white text-xs font-black uppercase tracking-wider rounded-xl shadow-md flex items-center gap-1.5 transition"
+            >
+              <Play className="w-3.5 h-3.5 fill-current" />
+              <span>Reprendre</span>
+            </button>
+          </div>
+        )}
+
+        {/* Adversaire */}
         <div>
-          <label className="text-[10px] font-bold uppercase text-slate-400 tracking-wider block mb-1">
+          <label className="text-[11px] font-bold uppercase text-slate-300 tracking-wider block mb-1.5">
             Adversaire *
           </label>
           <input
             type="text"
-            placeholder="Ex: St Jory, Lavaur, Quinte Fontsgrive..."
+            placeholder="Ex: St Jory, Lavaur, Quint Fonsegrives..."
             value={matchData.opponent}
             onChange={(e) => updateField('opponent', e.target.value)}
-            className="w-full bg-slate-900 border border-slate-750 focus:border-orange-500 rounded-xl px-3 py-2 text-sm font-semibold text-white placeholder-slate-500 outline-none transition"
+            className="w-full bg-slate-900 border border-slate-750 focus:border-orange-500 rounded-2xl px-3.5 py-3 text-sm font-bold text-white placeholder-slate-500 outline-none transition"
           />
         </div>
 
-        {/* Saison & Date (avec min-w-0 anti-débordement) */}
+        {/* Saison & Date */}
         <div className="grid grid-cols-2 gap-2.5 min-w-0">
           <div className="min-w-0 overflow-hidden">
             <label className="text-[10px] font-bold uppercase text-slate-400 tracking-wider block mb-1 truncate">
@@ -327,7 +342,7 @@ export function MatchTracker({ onNavigateToStats }) {
                   updateField('season', e.target.value);
                 }
               }}
-              className="w-full min-w-0 max-w-full box-border bg-slate-900 border border-slate-750 focus:border-orange-500 rounded-xl px-2 py-2 text-xs font-semibold text-white outline-none truncate"
+              className="w-full min-w-0 max-w-full box-border bg-slate-900 border border-slate-750 focus:border-orange-500 rounded-xl px-2.5 py-2.5 text-xs font-semibold text-white outline-none truncate"
             >
               {(seasons || [currentSeason]).map(s => (
                 <option key={s} value={s}>{s}</option>
@@ -344,12 +359,12 @@ export function MatchTracker({ onNavigateToStats }) {
               type="date"
               value={matchData.date}
               onChange={(e) => updateField('date', e.target.value)}
-              className="w-full min-w-0 max-w-full box-border bg-slate-900 border border-slate-750 focus:border-orange-500 rounded-xl px-2 py-2 text-xs font-semibold text-white outline-none transition"
+              className="w-full min-w-0 max-w-full box-border bg-slate-900 border border-slate-750 focus:border-orange-500 rounded-xl px-2.5 py-2.5 text-xs font-semibold text-white outline-none transition"
             />
           </div>
         </div>
 
-        {/* Formulaire ajout nouvelle saison dans Match */}
+        {/* Formulaire ajout nouvelle saison */}
         {isAddingNewSeason && (
           <div className="flex items-center gap-2 p-2 bg-slate-900 rounded-xl border border-orange-500/40 animate-in fade-in duration-150">
             <input
@@ -402,7 +417,7 @@ export function MatchTracker({ onNavigateToStats }) {
                   updateField('type', e.target.value);
                 }
               }}
-              className="w-full min-w-0 max-w-full box-border bg-slate-900 border border-slate-750 focus:border-orange-500 rounded-xl px-2 py-2 text-xs font-medium text-white outline-none truncate"
+              className="w-full min-w-0 max-w-full box-border bg-slate-900 border border-slate-750 focus:border-orange-500 rounded-xl px-2.5 py-2.5 text-xs font-medium text-white outline-none truncate"
             >
               {matchTypes.map(t => (
                 <option key={t} value={t}>{t}</option>
@@ -418,7 +433,7 @@ export function MatchTracker({ onNavigateToStats }) {
             <select
               value={matchData.matchDuration}
               onChange={(e) => updateField('matchDuration', parseInt(e.target.value))}
-              className="w-full min-w-0 max-w-full box-border bg-slate-900 border border-slate-750 focus:border-orange-500 rounded-xl px-2 py-2 text-xs font-medium text-white outline-none"
+              className="w-full min-w-0 max-w-full box-border bg-slate-900 border border-slate-750 focus:border-orange-500 rounded-xl px-2.5 py-2.5 text-xs font-medium text-white outline-none"
             >
               <option value={40}>40 min (Standard)</option>
               <option value={32}>32 min (Jeunes U15/U13)</option>
@@ -458,7 +473,7 @@ export function MatchTracker({ onNavigateToStats }) {
         <div className="bg-slate-900/90 rounded-2xl p-3 border border-slate-800">
           <div className="flex items-center justify-between mb-1.5">
             <span className="text-[10px] font-bold uppercase text-slate-400 tracking-wider">
-              Score Final (pour Valeur Ajoutée & Résultat)
+              Score du Match (modifiable en direct)
             </span>
             {formattedResult && (
               <span className={`text-[11px] font-mono font-black px-2 py-0.5 rounded ${
@@ -474,91 +489,55 @@ export function MatchTracker({ onNavigateToStats }) {
               <span className="text-[10px] text-slate-400">Score Notre Équipe :</span>
               <input
                 type="number"
-                placeholder="Ex: 73"
+                placeholder="0"
                 value={matchData.teamScore}
                 onChange={(e) => updateField('teamScore', e.target.value)}
-                className="w-full bg-slate-800/90 border border-slate-700 rounded-lg px-2.5 py-1.5 text-sm font-mono font-bold text-white outline-none mt-0.5"
+                className="w-full bg-slate-800/90 border border-slate-750 rounded-lg px-2.5 py-1.5 text-sm font-mono font-bold text-white outline-none mt-0.5"
               />
             </div>
             <div>
               <span className="text-[10px] text-slate-400">Score Adversaire :</span>
               <input
                 type="number"
-                placeholder="Ex: 44"
+                placeholder="0"
                 value={matchData.oppScore}
                 onChange={(e) => updateField('oppScore', e.target.value)}
-                className="w-full bg-slate-800/90 border border-slate-700 rounded-lg px-2.5 py-1.5 text-sm font-mono font-bold text-white outline-none mt-0.5"
+                className="w-full bg-slate-800/90 border border-slate-750 rounded-lg px-2.5 py-1.5 text-sm font-mono font-bold text-white outline-none mt-0.5"
               />
             </div>
           </div>
         </div>
 
-        {/* Bouton pour basculer en direct une fois les détails saisis */}
+        {/* GRAND BOUTON UNIQUE D'ENTRÉE EN MODE DIRECT PLEIN ÉCRAN */}
         <button
           type="button"
-          onClick={() => setIsLiveMode(true)}
-          className="w-full py-3.5 bg-gradient-to-r from-orange-500 to-amber-500 active:scale-98 text-white font-black text-xs uppercase tracking-wider rounded-2xl shadow-lg shadow-orange-500/20 flex items-center justify-center gap-2 transition"
+          onClick={() => {
+            if (!matchData.opponent.trim()) {
+              updateField('opponent', 'Adversaire');
+            }
+            setIsLiveMode(true);
+          }}
+          className="w-full py-4 bg-gradient-to-r from-orange-500 via-amber-500 to-orange-600 active:scale-98 text-white font-black text-sm uppercase tracking-wider rounded-2xl shadow-xl shadow-orange-500/25 flex items-center justify-center gap-2.5 transition mt-2"
         >
-          <Sparkles className="w-4 h-4 text-amber-200 animate-pulse" />
-          <span>Passer en Mode Direct Plein Écran (Zero Scroll)</span>
-          <Maximize2 className="w-4 h-4 ml-0.5 opacity-80" />
-        </button>
-      </div>
-
-      {/* 2. BARRE DE SYNTHÈSE LIVE STICKY */}
-      <LiveSummaryBar
-        match={{ ...matchData, points }}
-        minutes={minutes}
-        teamScore={teamScoreNum}
-      />
-
-      {/* 3. CHRONOMÈTRE DU TEMPS DE JEU */}
-      <GameTimer
-        timerSeconds={matchData.timerSeconds}
-        setTimerSeconds={(fn) => {
-          setMatchData(prev => ({
-            ...prev,
-            timerSeconds: typeof fn === 'function' ? fn(prev.timerSeconds) : fn
-          }));
-        }}
-        isRunning={matchData.isTimerRunning}
-        setIsRunning={(fn) => {
-          setMatchData(prev => ({
-            ...prev,
-            isTimerRunning: typeof fn === 'function' ? fn(prev.isTimerRunning) : fn
-          }));
-        }}
-      />
-
-      {/* 4. PAVÉ TACTILE DE SAISIE DES STATS */}
-      <StatKeypad
-        stats={{ ...matchData, points }}
-        onIncrement={handleIncrement}
-        onDecrement={handleDecrement}
-        onUndo={handleUndo}
-        canUndo={matchData.undoStack && matchData.undoStack.length > 0}
-        lastActionText={lastAction ? `${lastAction.label}` : ''}
-      />
-
-      {/* 5. BOUTONS BAS D'ACTION */}
-      <div className="space-y-2 pt-2">
-        <button
-          type="button"
-          onClick={handleSaveMatch}
-          className="w-full py-4 bg-gradient-to-r from-orange-500 via-amber-500 to-orange-600 active:scale-98 text-white font-black text-base uppercase tracking-wider rounded-3xl shadow-xl shadow-orange-500/25 flex items-center justify-center gap-2 transition"
-        >
-          <Save className="w-5 h-5" />
-          <span>Enregistrer le Match</span>
+          <Sparkles className="w-5 h-5 text-amber-200 animate-pulse" />
+          <span>{hasLiveDraft ? '🏀 Reprendre le Suivi en Direct' : '🏀 Démarrer le Match en Direct'}</span>
+          <Maximize2 className="w-4 h-4 ml-1 opacity-80" />
         </button>
 
-        <button
-          type="button"
-          onClick={handleResetMatch}
-          className="w-full py-2.5 text-slate-400 hover:text-slate-200 text-xs font-semibold flex items-center justify-center gap-1.5 active:scale-95 transition"
-        >
-          <RotateCcw className="w-3.5 h-3.5" />
-          <span>Réinitialiser la saisie</span>
-        </button>
+        {/* Bouton Réinitialiser discret si un brouillon est actif */}
+        {hasLiveDraft && (
+          <div className="text-center pt-1">
+            <button
+              type="button"
+              onClick={handleResetMatch}
+              className="text-xs text-slate-400 hover:text-rose-400 flex items-center justify-center gap-1 mx-auto transition"
+            >
+              <RotateCcw className="w-3.5 h-3.5" />
+              <span>Réinitialiser cette feuille de match</span>
+            </button>
+          </div>
+        )}
+
       </div>
 
       {/* MODAL DE SUCCÈS */}
