@@ -2,19 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { Play, Pause, RotateCcw, Plus, Minus, Clock } from 'lucide-react';
 
 export function GameTimer({ timerSeconds, setTimerSeconds, isRunning, setIsRunning }) {
-  // Intervalle pour faire défiler le chronomètre
-  useEffect(() => {
-    let interval = null;
-    if (isRunning) {
-      interval = setInterval(() => {
-        setTimerSeconds(prev => prev + 1);
-      }, 1000);
-    } else {
-      clearInterval(interval);
-    }
-    return () => clearInterval(interval);
-  }, [isRunning, setTimerSeconds]);
-
   const minutes = Math.floor(timerSeconds / 60);
   const seconds = timerSeconds % 60;
   const formattedTime = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;

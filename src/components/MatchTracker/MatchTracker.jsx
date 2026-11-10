@@ -4,8 +4,9 @@ import { GameTimer } from './GameTimer';
 import { StatKeypad } from './StatKeypad';
 import { LiveSummaryBar } from './LiveSummaryBar';
 import { MatchSuccessModal } from './MatchSuccessModal';
+import { LiveSingleScreen } from './LiveSingleScreen';
 import { calculatePoints, calculateQuickScore, calculateEfficiency, calculateValeurAjoutee } from '../../utils/formulas';
-import { Save, Calendar, Shield, Swords, Plus, RotateCcw, Award } from 'lucide-react';
+import { Save, Calendar, Shield, Swords, Plus, RotateCcw, Award, Sparkles, Maximize2 } from 'lucide-react';
 
 const DEFAULT_MATCH_TYPES = [
   'brassages region',
@@ -22,6 +23,7 @@ export function MatchTracker({ onNavigateToStats }) {
 
   const [isAddingNewSeason, setIsAddingNewSeason] = useState(false);
   const [newSeasonInput, setNewSeasonInput] = useState('');
+  const [isLiveMode, setIsLiveMode] = useState(false);
 
   // Initialisation à partir du brouillon ou valeurs par défaut
   const [matchData, setMatchData] = useState(() => {
@@ -55,6 +57,20 @@ export function MatchTracker({ onNavigateToStats }) {
   const [customTypePrompt, setCustomTypePrompt] = useState(false);
   const [newTypeName, setNewTypeName] = useState('');
   const [matchTypes, setMatchTypes] = useState(DEFAULT_MATCH_TYPES);
+
+  // Gestion continue du chronomètre en direct
+  useEffect(() => {
+    let interval = null;
+    if (matchData.isTimerRunning) {
+      interval = setInterval(() => {
+        setMatchData(prev => ({
+          ...prev,
+          timerSeconds: (prev.timerSeconds || 0) + 1
+        }));
+      }, 1000);
+    }
+    return () => clearInterval(interval);
+  }, [matchData.isTimerRunning]);
 
   // Sauvegarder le brouillon dans le contexte à chaque modification
   useEffect(() => {
@@ -218,8 +234,55 @@ export function MatchTracker({ onNavigateToStats }) {
     }
   };
 
+  // SI MODE DIRECT PLEIN ÉCRAN ACTIVÉ (1 seule page sans aucun défilement)
+  if (isLiveMode) {
+    return (
+      <>
+        <LiveSingleScreen
+          matchData={{ ...matchData, points }}
+          onIncrement={handleIncrement}
+          onDecrement={handleDecrement}
+          onUndo={handleUndo}
+          canUndo={matchData.undoStack && matchData.undoStack.length > 0}
+          lastActionText={lastAction ? `${lastAction.label}` : ''}
+          onOpenDetails={() => setIsLiveMode(false)}
+          onSaveMatch={handleSaveMatch}
+          onTimerToggle={() => setMatchData(prev => ({ ...prev, isTimerRunning: !prev.isTimerRunning }))}
+          onAdjustMinutes={(delta) => setMatchData(prev => ({ ...prev, timerSeconds: Math.max(0, (prev.timerSeconds || 0) + delta * 60) }))}
+          onUpdateField={updateField}
+          activePlayer={activePlayer}
+        />
+        {savedMatchSummary && (
+          <MatchSuccessModal
+            match={savedMatchSummary}
+            onClose={() => {
+              setSavedMatchSummary(null);
+              setIsLiveMode(false);
+            }}
+            onGoToStats={() => {
+              setSavedMatchSummary(null);
+              setIsLiveMode(false);
+              onNavigateToStats();
+            }}
+          />
+        )}
+      </>
+    );
+  }
+
   return (
     <div className="space-y-4 pb-24 max-w-md mx-auto">
+      {/* BOUTON D'ACCÈS AU MODE DIRECT PLEIN ÉCRAN */}
+      <button
+        type="button"
+        onClick={() => setIsLiveMode(true)}
+        className="w-full py-4 bg-gradient-to-r from-orange-500 via-amber-500 to-orange-600 active:scale-98 text-white font-black text-sm uppercase tracking-wider rounded-3xl shadow-xl shadow-orange-500/25 flex items-center justify-center gap-2.5 transition"
+      >
+        <Sparkles className="w-5 h-5 animate-pulse text-amber-200" />
+        <span>Lancer le Mode Direct (1 Seule Page)</span>
+        <Maximize2 className="w-4 h-4 ml-1 opacity-80" />
+      </button>
+
       {/* 1. FICHE CONTEXTE DU MATCH */}
       <div className="bg-slate-850/80 border border-slate-750 p-4 rounded-3xl shadow-sm space-y-3">
         <div className="flex items-center justify-between border-b border-slate-800 pb-2">
@@ -429,6 +492,17 @@ export function MatchTracker({ onNavigateToStats }) {
             </div>
           </div>
         </div>
+
+        {/* Bouton pour basculer en direct une fois les détails saisis */}
+        <button
+          type="button"
+          onClick={() => setIsLiveMode(true)}
+          className="w-full py-3.5 bg-gradient-to-r from-orange-500 to-amber-500 active:scale-98 text-white font-black text-xs uppercase tracking-wider rounded-2xl shadow-lg shadow-orange-500/20 flex items-center justify-center gap-2 transition"
+        >
+          <Sparkles className="w-4 h-4 text-amber-200 animate-pulse" />
+          <span>Passer en Mode Direct Plein Écran (Zero Scroll)</span>
+          <Maximize2 className="w-4 h-4 ml-0.5 opacity-80" />
+        </button>
       </div>
 
       {/* 2. BARRE DE SYNTHÈSE LIVE STICKY */}
