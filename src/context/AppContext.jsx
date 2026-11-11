@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import initialData from '../data/initialData.json';
+import quentinData from '../data/quentinData.json';
 
 const AppContext = createContext();
 
@@ -10,12 +11,34 @@ const STORAGE_KEY_ACTIVE_PLAYER = 'basket_stats_active_player_v1';
 const STORAGE_KEY_DRAFT = 'basket_stats_match_draft_v1';
 const STORAGE_KEY_SEASONS = 'basket_stats_seasons_v1';
 
+// Détection du paramètre secret ?demo=quentin ou ?quentin
+const hasQuentinDemoParam = () => {
+  if (typeof window === 'undefined') return false;
+  try {
+    const params = new URLSearchParams(window.location.search);
+    return params.get('demo') === 'quentin' || params.has('quentin');
+  } catch (e) {
+    return false;
+  }
+};
+
 export function AppProvider({ children }) {
+  const isDemoRequested = hasQuentinDemoParam();
+
+  // Notification Toast éphémère
+  const [toastMessage, setToastMessage] = useState('');
+
   // 1. Initialiser la liste des joueurs
   const [players, setPlayers] = useState(() => {
+    if (isDemoRequested) {
+      return quentinData.players || [];
+    }
     try {
       const saved = localStorage.getItem(STORAGE_KEY_PLAYERS);
-      if (saved) return JSON.parse(saved);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed)) return parsed;
+      }
     } catch (e) {
       console.error('Erreur chargement joueurs', e);
     }
@@ -24,6 +47,9 @@ export function AppProvider({ children }) {
 
   // 2. Joueur actif sélectionné
   const [activePlayerId, setActivePlayerId] = useState(() => {
+    if (isDemoRequested) {
+      return quentinData.players?.[0]?.id || '';
+    }
     try {
       const saved = localStorage.getItem(STORAGE_KEY_ACTIVE_PLAYER);
       if (saved) return saved;
@@ -35,9 +61,15 @@ export function AppProvider({ children }) {
 
   // 3. Matchs
   const [matches, setMatches] = useState(() => {
+    if (isDemoRequested) {
+      return quentinData.matches || [];
+    }
     try {
       const saved = localStorage.getItem(STORAGE_KEY_MATCHES);
-      if (saved) return JSON.parse(saved);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed)) return parsed;
+      }
     } catch (e) {
       console.error('Erreur chargement matchs', e);
     }
@@ -46,23 +78,32 @@ export function AppProvider({ children }) {
 
   // 4. Séances de shoots (Workouts)
   const [workouts, setWorkouts] = useState(() => {
+    if (isDemoRequested) {
+      return quentinData.workouts || [];
+    }
     try {
       const saved = localStorage.getItem(STORAGE_KEY_WORKOUTS);
-      if (saved) return JSON.parse(saved);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed)) return parsed;
+      }
     } catch (e) {
       console.error('Erreur chargement séances', e);
     }
     return initialData.workouts || [];
   });
 
-  // 5. Gestion des saisons (liste dynamique et saison courante)
+  // 5. Gestion des saisons
   const [seasons, setSeasons] = useState(() => {
+    if (isDemoRequested) {
+      const matchSeasons = Array.from(new Set((quentinData.matches || []).map(m => m.season).filter(Boolean)));
+      return Array.from(new Set(['2026-2027', '2025-2026', ...matchSeasons])).sort().reverse();
+    }
     try {
       const saved = localStorage.getItem(STORAGE_KEY_SEASONS);
       if (saved) return JSON.parse(saved);
     } catch (e) {}
 
-    // Récupérer toutes les saisons existantes dans les données
     const matchSeasons = Array.from(new Set((initialData.matches || []).map(m => m.season).filter(Boolean)));
     const merged = Array.from(new Set(['2026-2027', '2025-2026', ...matchSeasons])).sort().reverse();
     return merged;
@@ -72,7 +113,7 @@ export function AppProvider({ children }) {
     return seasons[0] || '2026-2027';
   });
 
-  // 6. Brouillon du match en direct (pour reprise immédiate sans perte)
+  // 6. Brouillon du match en direct
   const [matchDraft, setMatchDraft] = useState(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEY_DRAFT);
@@ -82,6 +123,25 @@ export function AppProvider({ children }) {
     }
     return null;
   });
+
+  // Nettoyage de l'URL si ?demo=quentin était utilisé et déclenchement du toast
+  useEffect(() => {
+    if (isDemoRequested) {
+      if (typeof window !== 'undefined' && window.history?.replaceState) {
+        const cleanUrl = window.location.pathname + window.location.hash;
+        window.history.replaceState({}, document.title, cleanUrl);
+      }
+      setToastMessage('🏀 Profil et 29 matchs de Quentin rechargés !');
+    }
+  }, [isDemoRequested]);
+
+  // Disparition automatique du toast après 3.5s
+  useEffect(() => {
+    if (toastMessage) {
+      const timer = setTimeout(() => setToastMessage(''), 3500);
+      return () => clearTimeout(timer);
+    }
+  }, [toastMessage]);
 
   // Sauvegarde automatique dans localStorage
   useEffect(() => {
@@ -125,14 +185,40 @@ export function AppProvider({ children }) {
     }
   }, [matchDraft]);
 
+  // Recharger les données complètes de Quentin
+  const loadQuentinData = () => {
+    setPlayers(quentinData.players || []);
+    setActivePlayerId(quentinData.players?.[0]?.id || '');
+    setMatches(quentinData.matches || []);
+    setWorkouts(quentinData.workouts || []);
+    const matchSeasons = Array.from(new Set((quentinData.matches || []).map(m => m.season).filter(Boolean)));
+    setSeasons(Array.from(new Set(['2026-2027', '2025-2026', ...matchSeasons])).sort().reverse());
+    setToastMessage('🏀 Profil et 29 matchs de Quentin rechargés !');
+  };
+
+  // Réinitialiser complètement l'application (espace vierge)
+  const resetAllData = () => {
+    setPlayers([]);
+    setActivePlayerId('');
+    setMatches([]);
+    setWorkouts([]);
+    setMatchDraft(null);
+    localStorage.removeItem(STORAGE_KEY_PLAYERS);
+    localStorage.removeItem(STORAGE_KEY_MATCHES);
+    localStorage.removeItem(STORAGE_KEY_WORKOUTS);
+    localStorage.removeItem(STORAGE_KEY_ACTIVE_PLAYER);
+    localStorage.removeItem(STORAGE_KEY_DRAFT);
+    setToastMessage('🗑️ Application réinitialisée (espace vierge)');
+  };
+
   // Joueur actuellement actif
   const activePlayer = players.find(p => p.id === activePlayerId) || players[0] || {
-    id: 'default',
+    id: '',
     name: 'Joueur',
     fullName: 'Joueur',
     team: 'U15',
-    jerseyNumber: '1',
-    club: 'Club'
+    jerseyNumber: '',
+    club: ''
   };
 
   // Matchs du joueur actif
@@ -159,7 +245,9 @@ export function AppProvider({ children }) {
 
   const deletePlayer = (playerId) => {
     if (players.length <= 1) {
-      alert('Vous devez conserver au moins un profil.');
+      if (confirm('Ce joueur est le dernier. Supprimer son profil réinitialisera l\'application à l\'état vierge. Confirmer ?')) {
+        resetAllData();
+      }
       return;
     }
     setPlayers(prev => prev.filter(p => p.id !== playerId));
@@ -244,6 +332,10 @@ export function AppProvider({ children }) {
     if (Array.isArray(imported.workouts)) {
       setWorkouts(imported.workouts);
     }
+    if (Array.isArray(imported.seasons) && imported.seasons.length > 0) {
+      setSeasons(imported.seasons);
+    }
+    setToastMessage('✅ Données restaurées avec succès !');
     return true;
   };
 
@@ -272,7 +364,11 @@ export function AppProvider({ children }) {
         addSeason,
         matchDraft,
         setMatchDraft,
-        importBackupData
+        importBackupData,
+        loadQuentinData,
+        resetAllData,
+        toastMessage,
+        setToastMessage
       }}
     >
       {children}

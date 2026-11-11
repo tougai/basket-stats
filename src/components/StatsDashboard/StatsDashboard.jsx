@@ -383,7 +383,7 @@ export function StatsDashboard() {
       <div className="text-center pt-2">
         <button
           type="button"
-          onClick={() => exportBackupJSON({ players, matches, workouts })}
+          onClick={() => exportBackupJSON({ players, matches, workouts, seasons })}
           className="text-xs text-slate-400 hover:text-orange-400 transition font-medium"
         >
           💾 Télécharger une copie de sauvegarde complète (JSON)

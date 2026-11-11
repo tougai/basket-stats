@@ -17,7 +17,9 @@ export function ProfileManager() {
     deletePlayer,
     matches,
     workouts,
-    importBackupData
+    seasons,
+    importBackupData,
+    resetAllData
   } = useApp();
 
   const [isEditing, setIsEditing] = useState(false);
@@ -26,9 +28,9 @@ export function ProfileManager() {
   const [qrCodeDataUrl, setQrCodeDataUrl] = useState('');
   const [copied, setCopied] = useState(false);
 
-  // Déterminer l'URL publique officielle
+  // Déterminer l'URL publique officielle (propre, sans paramètre query)
   const shareUrl = typeof window !== 'undefined' && !window.location.origin.includes('localhost')
-    ? window.location.href
+    ? `${window.location.origin}${window.location.pathname}`
     : PUBLIC_APP_URL;
 
   useEffect(() => {
@@ -299,11 +301,11 @@ export function ProfileManager() {
 
           <button
             type="button"
-            onClick={() => exportBackupJSON({ players, matches, workouts })}
+            onClick={() => exportBackupJSON({ players, matches, workouts, seasons })}
             className="py-2.5 bg-slate-800 hover:bg-slate-750 active:scale-95 text-slate-300 font-bold text-xs rounded-xl border border-slate-700 flex items-center justify-center gap-1.5 transition"
             title="Exporter Sauvegarde JSON"
           >
-            <span>Backup</span>
+            <span>💾 Backup</span>
           </button>
         </div>
 
@@ -322,12 +324,11 @@ export function ProfileManager() {
           </div>
         </div>
 
-        {/* Import JSON */}
+        {/* Import JSON & Réinitialisation */}
         <div className="border-t border-slate-800/80 pt-2.5 flex items-center justify-between text-xs text-slate-400">
-          <span>Restaurer une sauvegarde :</span>
           <label className="cursor-pointer text-orange-400 hover:text-orange-300 font-bold flex items-center gap-1">
             <Upload className="w-3.5 h-3.5" />
-            <span>Importer JSON</span>
+            <span>Restaurer JSON</span>
             <input
               type="file"
               accept=".json"
@@ -335,6 +336,20 @@ export function ProfileManager() {
               className="hidden"
             />
           </label>
+
+          <button
+            type="button"
+            onClick={() => {
+              if (confirm('Voulez-vous réinitialiser l\'application ? Toutes les données actuelles seront effacées pour repartir d\'une page vierge. Pensez à faire une sauvegarde JSON au préalable !')) {
+                resetAllData();
+              }
+            }}
+            className="text-slate-500 hover:text-red-400 transition flex items-center gap-1 text-[11px]"
+            title="Réinitialiser à l'état vierge"
+          >
+            <Trash2 className="w-3 h-3" />
+            <span>Réinitialiser</span>
+          </button>
         </div>
       </div>
 

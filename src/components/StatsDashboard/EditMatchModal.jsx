@@ -13,8 +13,6 @@ import { X, Save, Clock, Trophy, Shield, Swords, Plus, Minus, AlertCircle } from
 export function EditMatchModal({ match, onClose, onUpdated }) {
   const { updateMatch, seasons } = useApp();
 
-  if (!match) return null;
-
   // Conversion de la date JJ/MM/AAAA vers AAAA-MM-JJ pour input[type="date"]
   const parseToIsoDate = (dStr) => {
     if (!dStr) return new Date().toISOString().slice(0, 10);
@@ -28,31 +26,33 @@ export function EditMatchModal({ match, onClose, onUpdated }) {
   };
 
   // Parsing du résultat existant (ex: "73-44 W")
-  const parsedRes = parseResult(match.result);
+  const parsedRes = match ? parseResult(match.result) : { teamScore: '', oppScore: '' };
 
-  const [dateIso, setDateIso] = useState(() => parseToIsoDate(match.date));
-  const [opponent, setOpponent] = useState(match.opponent || '');
-  const [season, setSeason] = useState(match.season || '2026-2027');
-  const [type, setType] = useState(match.type || 'saison reg (dom)');
-  const [matchDuration, setMatchDuration] = useState(match.matchDuration || 40);
+  const [dateIso, setDateIso] = useState(() => match ? parseToIsoDate(match.date) : '');
+  const [opponent, setOpponent] = useState(match?.opponent || '');
+  const [season, setSeason] = useState(match?.season || '2026-2027');
+  const [type, setType] = useState(match?.type || 'saison reg (dom)');
+  const [matchDuration, setMatchDuration] = useState(match?.matchDuration || 40);
 
   // Temps de jeu officiel (minutes saisies après coup)
-  const [minutes, setMinutes] = useState(parseInt(match.minutes) || 0);
+  const [minutes, setMinutes] = useState(parseInt(match?.minutes) || 0);
 
   // Scores
   const [teamScore, setTeamScore] = useState(parsedRes.teamScore || '');
   const [oppScore, setOppScore] = useState(parsedRes.oppScore || '');
 
   // Statistiques individuelles
-  const [pts2Made, setPts2Made] = useState(parseInt(match.pts2Made) || 0);
-  const [pts3Made, setPts3Made] = useState(parseInt(match.pts3Made) || 0);
-  const [ftMade, setFtMade] = useState(parseInt(match.ftMade) || 0);
-  const [reb, setReb] = useState(parseInt(match.reb) || 0);
-  const [dreb, setDreb] = useState(parseInt(match.dreb) || 0);
-  const [ast, setAst] = useState(parseInt(match.ast) || 0);
-  const [stl, setStl] = useState(parseInt(match.stl) || 0);
-  const [def, setDef] = useState(parseInt(match.def) || 0);
-  const [pf, setPf] = useState(parseInt(match.pf) || 0);
+  const [pts2Made, setPts2Made] = useState(parseInt(match?.pts2Made) || 0);
+  const [pts3Made, setPts3Made] = useState(parseInt(match?.pts3Made) || 0);
+  const [ftMade, setFtMade] = useState(parseInt(match?.ftMade) || 0);
+  const [reb, setReb] = useState(parseInt(match?.reb) || 0);
+  const [dreb, setDreb] = useState(parseInt(match?.dreb) || 0);
+  const [ast, setAst] = useState(parseInt(match?.ast) || 0);
+  const [stl, setStl] = useState(parseInt(match?.stl) || 0);
+  const [def, setDef] = useState(parseInt(match?.def) || 0);
+  const [pf, setPf] = useState(parseInt(match?.pf) || 0);
+
+  if (!match) return null;
 
   // Calculs dynamiques
   const calculatedPts = calculatePoints(pts2Made, pts3Made, ftMade);
