@@ -22,7 +22,7 @@ export function Header({ onOpenProfileModal, isWelcomeMode }) {
   const hasPlayers = players && players.length > 0;
 
   return (
-    <header className="sticky top-0 z-40 bg-slate-900/95 backdrop-blur-md border-b border-slate-800 px-4 py-3 select-none">
+    <header className="sticky top-0 z-40 bg-slate-900/95 backdrop-blur-md border-b border-slate-800 px-4 pt-safe pb-3 select-none">
       <div className="max-w-md mx-auto flex items-center justify-between">
         {/* Logo & Titre */}
         <div className="flex items-center gap-2.5">

@@ -37,12 +37,18 @@
   }
 }
 
-/* Safe area padding for notch & home indicator */
-.safe-top {
-  padding-top: max(0.5rem, env(safe-area-inset-top, 0px));
+/* Safe area padding for iOS notch & home indicator */
+.safe-top, .pt-safe {
+  padding-top: calc(env(safe-area-inset-top, 0px) + 0.75rem) !important;
 }
-.safe-bottom {
-  padding-bottom: max(0.5rem, env(safe-area-inset-bottom, 0px));
+.safe-bottom, .pb-safe {
+  padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 0.5rem) !important;
+}
+
+/* Modals & Fullscreen overlays */
+.modal-safe-overlay {
+  padding-top: calc(env(safe-area-inset-top, 0px) + 1rem) !important;
+  padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 1rem) !important;
 }
 
 /* Custom scrollbars */

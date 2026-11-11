@@ -355,7 +355,7 @@ export function ProfileManager() {
 
       {/* MODAL QR CODE À FLASHER AU GYMNASE */}
       {showQrModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-md animate-in fade-in duration-200">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-md animate-in fade-in duration-200 modal-safe-overlay">
           <div className="bg-slate-900 border border-slate-750 w-full max-w-sm rounded-3xl p-6 text-center shadow-2xl relative">
             <button
               type="button"
@@ -404,7 +404,7 @@ export function ProfileManager() {
 
       {/* FORMULAIRE MODAL AJOUT / MODIFICATION JOUEUR */}
       {isEditing && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md modal-safe-overlay">
           <div className="bg-slate-900 border border-slate-750 w-full max-w-sm rounded-3xl p-5 shadow-2xl space-y-4">
             <h3 className="text-base font-black text-white">
               {editingPlayerId ? 'Modifier le profil' : 'Ajouter un enfant (Fratrie)'}

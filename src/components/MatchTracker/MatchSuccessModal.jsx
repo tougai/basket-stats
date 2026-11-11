@@ -22,7 +22,7 @@ export function MatchSuccessModal({ match, onClose, onGoToStats }) {
   const category = getCategory(match.quickScore, match.minutes);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md animate-in fade-in duration-200">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md animate-in fade-in duration-200 modal-safe-overlay">
       <div className="bg-slate-900 border border-slate-750 w-full max-w-sm rounded-3xl p-6 text-center shadow-2xl animate-in zoom-in-95 duration-200">
         <div className="w-16 h-16 rounded-full bg-gradient-to-tr from-orange-500 to-amber-500 flex items-center justify-center mx-auto mb-4 shadow-lg shadow-orange-500/30">
           <Trophy className="w-8 h-8 text-white" />

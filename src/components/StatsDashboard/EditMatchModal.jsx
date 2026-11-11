@@ -126,7 +126,7 @@ export function EditMatchModal({ match, onClose, onUpdated }) {
   };
 
   return (
-    <div className="fixed inset-0 z-60 flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-xs animate-in fade-in duration-150">
+    <div className="fixed inset-0 z-60 flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-xs animate-in fade-in duration-150 modal-safe-overlay">
       <div className="bg-slate-900 border border-slate-750 w-full max-w-md rounded-3xl p-5 shadow-2xl flex flex-col max-h-[92vh] text-white">
         
         {/* Header */}
