@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useApp } from '../../context/AppContext';
-import { UserPlus, Edit3, Trash2, Check, Upload, Share2, QrCode, Shield, Award, Users, Copy, CheckCheck, X, Camera } from 'lucide-react';
+import { UserPlus, Edit3, Trash2, Check, Upload, Share2, QrCode, Shield, Award, Users, Copy, CheckCheck, X, Camera, RotateCw } from 'lucide-react';
 import { exportBackupJSON } from '../../utils/exportExcel';
 import { compressImageFile } from '../../utils/imageUtils';
 import QRCode from 'qrcode';
@@ -355,6 +355,16 @@ export function ProfileManager() {
               className="hidden"
             />
           </label>
+
+          <button
+            type="button"
+            onClick={() => window.location.reload()}
+            className="text-slate-400 hover:text-white transition flex items-center gap-1 text-[11px] font-medium"
+            title="Recharger l'application pour appliquer les mises à jour"
+          >
+            <RotateCw className="w-3 h-3 text-orange-400" />
+            <span>Recharger l'app</span>
+          </button>
 
           <button
             type="button"
