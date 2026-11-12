@@ -9,9 +9,10 @@ import {
   getCategory,
   parseResult
 } from '../../utils/formulas';
-import { Download, Trash2, Trophy, Clock, Target, Eye, Filter, Share2, Pencil } from 'lucide-react';
+import { Download, Trash2, Trophy, Clock, Target, Eye, Filter, Share2, Pencil, Settings, ChevronRight, TrendingUp } from 'lucide-react';
+import { SeasonManagerModal } from '../Common/SeasonManagerModal';
 
-export function StatsDashboard() {
+export function StatsDashboard({ onNavigateToProgression }) {
   const {
     activePlayer,
     activePlayerMatches,
@@ -41,6 +42,7 @@ export function StatsDashboard() {
   const [editingMatch, setEditingMatch] = useState(null);
   const [isAddingSeason, setIsAddingSeason] = useState(false);
   const [newSeasonInput, setNewSeasonInput] = useState('');
+  const [showSeasonManager, setShowSeasonManager] = useState(false);
 
   // Filtrer les matchs selon la saison et le type
   const filteredMatches = activePlayerMatches.filter(m => {
@@ -123,13 +125,22 @@ export function StatsDashboard() {
       {/* 1. SÉLECTEUR DE SAISON & EXPORT */}
       <div className="bg-slate-850/80 border border-slate-750 p-3.5 rounded-3xl shadow-sm space-y-3">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span className="text-xs font-bold uppercase tracking-wider text-white">
-              Bilan Saison
-            </span>
-            <span className="text-xs font-semibold text-orange-400 bg-orange-500/10 px-2.5 py-0.5 rounded-full">
-              {activePlayer.name}
-            </span>
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-orange-500 to-amber-600 flex items-center justify-center font-mono font-bold text-white text-xs overflow-hidden shrink-0 shadow-sm">
+              {activePlayer.photoUrl ? (
+                <img src={activePlayer.photoUrl} alt={activePlayer.name} className="w-full h-full object-cover" />
+              ) : (
+                activePlayer.name?.[0]?.toUpperCase() || 'J'
+              )}
+            </div>
+            <div>
+              <div className="text-xs font-black text-white leading-tight">
+                Bilan {activePlayer.name}
+              </div>
+              <div className="text-[10px] text-slate-400 font-medium">
+                #{activePlayer.jerseyNumber || '?'} • {activePlayer.team || 'U15'}
+              </div>
+            </div>
           </div>
 
           {/* Bouton Export Excel officiel */}
@@ -181,6 +192,16 @@ export function StatsDashboard() {
           >
             <span>+</span>
             <span>Saison</span>
+          </button>
+
+          {/* Bouton gestion complète des saisons */}
+          <button
+            type="button"
+            onClick={() => setShowSeasonManager(true)}
+            className="p-1.5 px-2 rounded-xl font-bold bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-orange-400 border border-slate-700 flex items-center justify-center whitespace-nowrap active:scale-95 transition"
+            title="Gérer les saisons (renommer ou supprimer)"
+          >
+            <Settings className="w-3.5 h-3.5" />
           </button>
         </div>
 
@@ -278,6 +299,30 @@ export function StatsDashboard() {
           </div>
         </div>
       </div>
+
+      {/* Raccourci vers les graphiques de progression */}
+      {onNavigateToProgression && sortedMatches.length > 0 && (
+        <button
+          type="button"
+          onClick={onNavigateToProgression}
+          className="w-full p-3 bg-gradient-to-r from-orange-500/15 via-amber-500/10 to-transparent border border-orange-500/30 rounded-2xl flex items-center justify-between group active:scale-98 transition shadow-sm"
+        >
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-xl bg-orange-500/20 border border-orange-500/40 text-orange-400 flex items-center justify-center font-bold text-base shadow-sm">
+              📈
+            </div>
+            <div className="text-left">
+              <div className="text-xs font-black text-white group-hover:text-orange-400 transition">
+                Voir les graphiques de progression
+              </div>
+              <div className="text-[10px] text-slate-400">
+                Courbes de points, records et constance de {activePlayer.name}
+              </div>
+            </div>
+          </div>
+          <ChevronRight className="w-4 h-4 text-orange-400 group-hover:translate-x-0.5 transition-transform" />
+        </button>
+      )}
 
       {/* 3. LISTE DES MATCHS AVEC FILTRE */}
       <div className="bg-slate-850/80 border border-slate-750 p-4 rounded-3xl shadow-sm space-y-3">
@@ -414,6 +459,10 @@ export function StatsDashboard() {
             }
           }}
         />
+      )}
+      {/* MODAL GESTION DES SAISONS */}
+      {showSeasonManager && (
+        <SeasonManagerModal onClose={() => setShowSeasonManager(false)} />
       )}
     </div>
   );

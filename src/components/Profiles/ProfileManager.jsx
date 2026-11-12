@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useApp } from '../../context/AppContext';
-import { UserPlus, Edit3, Trash2, Check, Upload, Share2, QrCode, Shield, Award, Users, Copy, CheckCheck, X } from 'lucide-react';
+import { UserPlus, Edit3, Trash2, Check, Upload, Share2, QrCode, Shield, Award, Users, Copy, CheckCheck, X, Camera } from 'lucide-react';
 import { exportBackupJSON } from '../../utils/exportExcel';
+import { compressImageFile } from '../../utils/imageUtils';
 import QRCode from 'qrcode';
 
 const PUBLIC_APP_URL = 'https://tougai.github.io/basket-stats/';
@@ -50,7 +51,8 @@ export function ProfileManager() {
     team: 'U15M R2',
     club: 'BBC',
     position: 'Meneur / Arrière',
-    dominantHand: 'Droitier'
+    dominantHand: 'Droitier',
+    photoUrl: ''
   });
 
   const openAddForm = () => {
@@ -61,7 +63,8 @@ export function ProfileManager() {
       team: 'U15',
       club: 'BBC',
       position: 'Arrière',
-      dominantHand: 'Droitier'
+      dominantHand: 'Droitier',
+      photoUrl: ''
     });
     setEditingPlayerId(null);
     setIsEditing(true);
@@ -75,10 +78,22 @@ export function ProfileManager() {
       team: player.team || '',
       club: player.club || '',
       position: player.position || '',
-      dominantHand: player.dominantHand || 'Droitier'
+      dominantHand: player.dominantHand || 'Droitier',
+      photoUrl: player.photoUrl || ''
     });
     setEditingPlayerId(player.id);
     setIsEditing(true);
+  };
+
+  const handlePhotoUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      const compressed = await compressImageFile(file, 200, 0.82);
+      setFormData(prev => ({ ...prev, photoUrl: compressed }));
+    } catch (err) {
+      alert('Erreur lors du traitement de la photo.');
+    }
   };
 
   const handleSubmit = (e) => {
@@ -160,8 +175,12 @@ export function ProfileManager() {
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-orange-500 to-amber-600 flex items-center justify-center font-mono font-black text-white text-base shadow-md">
-                      #{p.jerseyNumber || '?'}
+                    <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-orange-500 to-amber-600 flex items-center justify-center font-mono font-black text-white text-base shadow-md overflow-hidden relative shrink-0">
+                      {p.photoUrl ? (
+                        <img src={p.photoUrl} alt={p.name} className="w-full h-full object-cover" />
+                      ) : (
+                        <span>#{p.jerseyNumber || '?'}</span>
+                      )}
                     </div>
 
                     <div>
@@ -411,6 +430,44 @@ export function ProfileManager() {
             </h3>
 
             <form onSubmit={handleSubmit} className="space-y-3">
+              {/* Photo / Avatar du joueur */}
+              <div className="flex items-center gap-3.5 p-2.5 bg-slate-850/80 rounded-2xl border border-slate-750">
+                <div className="relative w-14 h-14 rounded-2xl bg-gradient-to-br from-orange-500 to-amber-600 flex items-center justify-center text-white font-mono font-black text-lg shadow-md overflow-hidden shrink-0">
+                  {formData.photoUrl ? (
+                    <img src={formData.photoUrl} alt="Aperçu" className="w-full h-full object-cover" />
+                  ) : (
+                    <span>#{formData.jerseyNumber || '?'}</span>
+                  )}
+                </div>
+
+                <div className="flex-1 min-w-0">
+                  <div className="text-[11px] font-bold text-white mb-1">Photo du joueur</div>
+                  <div className="flex items-center gap-2">
+                    <label className="cursor-pointer px-2.5 py-1.5 bg-slate-800 hover:bg-slate-750 text-orange-400 hover:text-orange-300 font-bold rounded-xl text-xs flex items-center gap-1.5 border border-slate-700 active:scale-95 transition">
+                      <Camera className="w-3.5 h-3.5" />
+                      <span>{formData.photoUrl ? 'Changer' : 'Ajouter'}</span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handlePhotoUpload}
+                        className="hidden"
+                      />
+                    </label>
+
+                    {formData.photoUrl && (
+                      <button
+                        type="button"
+                        onClick={() => setFormData(prev => ({ ...prev, photoUrl: '' }))}
+                        className="p-1.5 text-slate-400 hover:text-red-400 hover:bg-slate-800 rounded-xl transition"
+                        title="Supprimer la photo"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
+
               <div>
                 <label className="text-[10px] font-bold uppercase text-slate-400 tracking-wider block mb-1">
                   Prénom *

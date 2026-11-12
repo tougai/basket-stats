@@ -163,6 +163,50 @@ export function AppProvider({ children }) {
     setCurrentSeason(clean);
   };
 
+  const updateSeason = (oldSeason, newSeason) => {
+    if (!newSeason || typeof newSeason !== 'string') return;
+    const clean = newSeason.trim();
+    if (!clean || clean === oldSeason) return;
+
+    setSeasons(prev => {
+      const updated = prev.map(s => s === oldSeason ? clean : s);
+      return Array.from(new Set(updated)).sort().reverse();
+    });
+
+    // Mettre à jour les matchs rattachés à cette saison
+    setMatches(prev => prev.map(m => m.season === oldSeason ? { ...m, season: clean } : m));
+
+    if (currentSeason === oldSeason) {
+      setCurrentSeason(clean);
+    }
+    setToastMessage(`Saison renommée en "${clean}"`);
+  };
+
+  const deleteSeason = (seasonToDelete) => {
+    if (seasons.length <= 1) {
+      alert('Vous devez conserver au moins une saison.');
+      return false;
+    }
+
+    const matchesCount = matches.filter(m => m.season === seasonToDelete).length;
+    if (matchesCount > 0) {
+      const confirmDelete = window.confirm(
+        `Cette saison contient ${matchesCount} match(s). Supprimer la saison supprimera également ces matchs. Êtes-vous sûr de vouloir continuer ?`
+      );
+      if (!confirmDelete) return false;
+      setMatches(prev => prev.filter(m => m.season !== seasonToDelete));
+    }
+
+    const remaining = seasons.filter(s => s !== seasonToDelete);
+    setSeasons(remaining);
+
+    if (currentSeason === seasonToDelete) {
+      setCurrentSeason(remaining[0] || '2026-2027');
+    }
+    setToastMessage(`Saison "${seasonToDelete}" supprimée`);
+    return true;
+  };
+
   useEffect(() => {
     if (activePlayerId) {
       localStorage.setItem(STORAGE_KEY_ACTIVE_PLAYER, activePlayerId);
@@ -319,6 +363,27 @@ export function AppProvider({ children }) {
     setWorkouts(prev => prev.filter(w => w.id !== workoutId));
   };
 
+  const updateWorkout = (workoutId, updatedData) => {
+    setWorkouts(prev => prev.map(w => {
+      if (w.id === workoutId) {
+        const made = updatedData.made !== undefined ? parseInt(updatedData.made) || 0 : w.made;
+        const missed = updatedData.missed !== undefined ? parseInt(updatedData.missed) || 0 : w.missed;
+        const total = made + missed;
+        const percentage = total > 0 ? Number(((made / total) * 100).toFixed(1)) : 0;
+        return {
+          ...w,
+          ...updatedData,
+          made,
+          missed,
+          total,
+          percentage
+        };
+      }
+      return w;
+    }));
+    setToastMessage('Séance de shoot mise à jour !');
+  };
+
   // Import global de sauvegarde JSON
   const importBackupData = (imported) => {
     if (!imported) return false;
@@ -357,11 +422,14 @@ export function AppProvider({ children }) {
         workouts,
         activePlayerWorkouts,
         saveWorkout,
+        updateWorkout,
         deleteWorkout,
         currentSeason,
         setCurrentSeason,
         seasons,
         addSeason,
+        updateSeason,
+        deleteSeason,
         matchDraft,
         setMatchDraft,
         importBackupData,

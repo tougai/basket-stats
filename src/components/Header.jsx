@@ -60,8 +60,12 @@ export function Header({ onOpenProfileModal, isWelcomeMode }) {
                 onClick={() => setShowPlayerDropdown(!showPlayerDropdown)}
                 className="flex items-center gap-1.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-full py-1.5 px-3 transition active:scale-95 shadow-sm"
               >
-                <div className="w-5 h-5 rounded-full bg-gradient-to-br from-orange-500 to-amber-600 flex items-center justify-center text-[10px] font-bold text-white shadow-sm">
-                  {activePlayer.name?.[0]?.toUpperCase() || 'J'}
+                <div className="w-5 h-5 rounded-full bg-gradient-to-br from-orange-500 to-amber-600 flex items-center justify-center text-[10px] font-bold text-white shadow-sm overflow-hidden shrink-0">
+                  {activePlayer.photoUrl ? (
+                    <img src={activePlayer.photoUrl} alt={activePlayer.name} className="w-full h-full object-cover" />
+                  ) : (
+                    activePlayer.name?.[0]?.toUpperCase() || 'J'
+                  )}
                 </div>
                 <span className="text-xs font-bold text-white max-w-[80px] truncate">
                   {activePlayer.name}
@@ -95,8 +99,12 @@ export function Header({ onOpenProfileModal, isWelcomeMode }) {
                           }`}
                         >
                           <div className="flex items-center gap-2.5 truncate">
-                            <div className="w-7 h-7 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center font-mono font-bold text-[11px] text-white shrink-0">
-                              #{p.jerseyNumber || '?'}
+                            <div className="w-7 h-7 rounded-xl bg-slate-800 border border-slate-750 flex items-center justify-center font-mono font-bold text-[11px] text-white shrink-0 overflow-hidden">
+                              {p.photoUrl ? (
+                                <img src={p.photoUrl} alt={p.name} className="w-full h-full object-cover" />
+                              ) : (
+                                `#${p.jerseyNumber || '?'}`
+                              )}
                             </div>
                             <div className="text-left truncate">
                               <div className="truncate font-bold text-white">{p.name}</div>

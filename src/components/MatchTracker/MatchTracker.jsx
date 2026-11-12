@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useApp } from '../../context/AppContext';
 import { MatchSuccessModal } from './MatchSuccessModal';
 import { LiveSingleScreen } from './LiveSingleScreen';
+import { SeasonManagerModal } from '../Common/SeasonManagerModal';
 import { calculatePoints, calculateQuickScore, calculateEfficiency, calculateValeurAjoutee } from '../../utils/formulas';
 import { RotateCcw, Sparkles, Maximize2, Play, Users, Calendar } from 'lucide-react';
 
@@ -21,6 +22,7 @@ export function MatchTracker({ onNavigateToStats }) {
   const [isAddingNewSeason, setIsAddingNewSeason] = useState(false);
   const [newSeasonInput, setNewSeasonInput] = useState('');
   const [isLiveMode, setIsLiveMode] = useState(false);
+  const [showSeasonManager, setShowSeasonManager] = useState(false);
 
   // Initialisation à partir du brouillon ou valeurs par défaut
   const [matchData, setMatchData] = useState(() => {
@@ -286,9 +288,18 @@ export function MatchTracker({ onNavigateToStats }) {
             </div>
           </div>
 
-          <span className="text-xs font-mono font-bold text-orange-400 bg-orange-500/10 px-3 py-1 rounded-full border border-orange-500/20">
-            {activePlayer.name} (#{activePlayer.jerseyNumber || '?'})
-          </span>
+          <div className="flex items-center gap-1.5 bg-orange-500/10 px-2.5 py-1 rounded-full border border-orange-500/20">
+            <div className="w-4 h-4 rounded-full overflow-hidden bg-orange-500/30 flex items-center justify-center text-[9px] font-bold text-orange-400 shrink-0">
+              {activePlayer.photoUrl ? (
+                <img src={activePlayer.photoUrl} alt={activePlayer.name} className="w-full h-full object-cover" />
+              ) : (
+                activePlayer.name?.[0]?.toUpperCase() || 'J'
+              )}
+            </div>
+            <span className="text-xs font-mono font-bold text-orange-400 truncate max-w-[100px]">
+              {activePlayer.name} (#{activePlayer.jerseyNumber || '?'})
+            </span>
+          </div>
         </div>
 
         {/* Bannière de reprise si match déjà en cours */}
@@ -338,6 +349,8 @@ export function MatchTracker({ onNavigateToStats }) {
               onChange={(e) => {
                 if (e.target.value === '__add_season__') {
                   setIsAddingNewSeason(true);
+                } else if (e.target.value === '__manage_seasons__') {
+                  setShowSeasonManager(true);
                 } else {
                   updateField('season', e.target.value);
                 }
@@ -348,6 +361,7 @@ export function MatchTracker({ onNavigateToStats }) {
                 <option key={s} value={s}>{s}</option>
               ))}
               <option value="__add_season__">+ Nouvelle saison...</option>
+              <option value="__manage_seasons__">⚙️ Gérer les saisons...</option>
             </select>
           </div>
 
@@ -550,6 +564,10 @@ export function MatchTracker({ onNavigateToStats }) {
             onNavigateToStats();
           }}
         />
+      )}
+      {/* MODAL GESTION DES SAISONS */}
+      {showSeasonManager && (
+        <SeasonManagerModal onClose={() => setShowSeasonManager(false)} />
       )}
     </div>
   );

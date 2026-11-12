@@ -5,6 +5,7 @@ import { Navigation } from './components/Navigation';
 import { MatchTracker } from './components/MatchTracker/MatchTracker';
 import { ShootingTracker } from './components/ShootingTracker/ShootingTracker';
 import { StatsDashboard } from './components/StatsDashboard/StatsDashboard';
+import { ProgressionCharts } from './components/Progression/ProgressionCharts';
 import { ProfileManager } from './components/Profiles/ProfileManager';
 import { WelcomeOnboarding } from './components/Welcome/WelcomeOnboarding';
 
@@ -45,7 +46,10 @@ function MainApp() {
               <ShootingTracker />
             )}
             {activeTab === 'stats' && (
-              <StatsDashboard />
+              <StatsDashboard onNavigateToProgression={() => setActiveTab('progression')} />
+            )}
+            {activeTab === 'progression' && (
+              <ProgressionCharts onNavigateToMatch={() => setActiveTab('match')} />
             )}
             {activeTab === 'profiles' && (
               <ProfileManager />

@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useApp } from '../../context/AppContext';
 import { calculateShootingAccuracy } from '../../utils/formulas';
-import { Target, Flame, RotateCcw, Save, Trash2, Calendar, Clock, Award, CheckCircle2, XCircle } from 'lucide-react';
+import { Target, Flame, RotateCcw, Save, Trash2, Calendar, Clock, Award, CheckCircle2, XCircle, Edit2 } from 'lucide-react';
 import confetti from 'canvas-confetti';
+import { EditWorkoutModal } from './EditWorkoutModal';
 
 const DRILL_PRESETS = [
   { id: 'lf', label: 'Lancers Francs', target: 20, icon: '🎯' },
@@ -28,6 +29,7 @@ export function ShootingTracker() {
   const [sessionStartTime, setSessionStartTime] = useState(Date.now());
   const [notes, setNotes] = useState('');
   const [showHistory, setShowHistory] = useState(false);
+  const [editingWorkout, setEditingWorkout] = useState(null);
 
   const accuracy = calculateShootingAccuracy(made, missed);
   const totalShots = made + missed;
@@ -127,9 +129,18 @@ export function ShootingTracker() {
           <span className="text-[11px] font-bold uppercase tracking-wider text-orange-400 flex items-center gap-1.5">
             🎯 Atelier de Shoot
           </span>
-          <span className="text-[11px] font-semibold text-slate-300">
-            {activePlayer.name}
-          </span>
+          <div className="flex items-center gap-1.5 bg-slate-800 px-2.5 py-0.5 rounded-full border border-slate-750">
+            <div className="w-4 h-4 rounded-full overflow-hidden bg-orange-500/20 flex items-center justify-center text-[9px] font-bold text-orange-400 shrink-0">
+              {activePlayer.photoUrl ? (
+                <img src={activePlayer.photoUrl} alt={activePlayer.name} className="w-full h-full object-cover" />
+              ) : (
+                activePlayer.name?.[0]?.toUpperCase() || 'J'
+              )}
+            </div>
+            <span className="text-[11px] font-semibold text-slate-300">
+              {activePlayer.name}
+            </span>
+          </div>
         </div>
 
         <div className="grid grid-cols-2 gap-2">
@@ -353,12 +364,22 @@ export function ShootingTracker() {
 
                     <button
                       type="button"
+                      onClick={() => setEditingWorkout(w)}
+                      className="text-slate-500 hover:text-orange-400 p-1 transition"
+                      title="Modifier cette séance"
+                    >
+                      <Edit2 className="w-3.5 h-3.5" />
+                    </button>
+
+                    <button
+                      type="button"
                       onClick={() => {
                         if (window.confirm('Supprimer cette séance ?')) {
                           deleteWorkout(w.id);
                         }
                       }}
-                      className="text-slate-500 hover:text-red-400 p-1"
+                      className="text-slate-500 hover:text-red-400 p-1 transition"
+                      title="Supprimer cette séance"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
                     </button>
@@ -369,6 +390,14 @@ export function ShootingTracker() {
           </div>
         )}
       </div>
+
+      {/* MODAL MODIFICATION SÉANCE */}
+      {editingWorkout && (
+        <EditWorkoutModal
+          workout={editingWorkout}
+          onClose={() => setEditingWorkout(null)}
+        />
+      )}
     </div>
   );
 }

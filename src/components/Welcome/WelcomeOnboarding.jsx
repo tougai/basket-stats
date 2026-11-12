@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
-import { UserPlus, Upload, ShieldCheck, Sparkles, ArrowRight } from 'lucide-react';
+import { UserPlus, Upload, ShieldCheck, Sparkles, ArrowRight, Camera, Trash2 } from 'lucide-react';
+import { compressImageFile } from '../../utils/imageUtils';
 
 export function WelcomeOnboarding() {
   const { addPlayer, importBackupData, loadQuentinData } = useApp();
@@ -11,7 +12,8 @@ export function WelcomeOnboarding() {
     team: 'U15',
     club: 'BBC',
     position: 'Arrière / Meneur',
-    dominantHand: 'Droitier'
+    dominantHand: 'Droitier',
+    photoUrl: ''
   });
 
   const [secretTapCount, setSecretTapCount] = useState(0);
@@ -24,6 +26,17 @@ export function WelcomeOnboarding() {
     } else {
       setSecretTapCount(next);
       setTimeout(() => setSecretTapCount(0), 3000);
+    }
+  };
+
+  const handlePhotoUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      const compressed = await compressImageFile(file, 200, 0.82);
+      setFormData(prev => ({ ...prev, photoUrl: compressed }));
+    } catch (err) {
+      alert('Erreur lors du traitement de la photo.');
     }
   };
 
@@ -42,7 +55,8 @@ export function WelcomeOnboarding() {
       club: formData.club.trim() || 'Club',
       position: formData.position || 'Arrière / Meneur',
       dominantHand: formData.dominantHand || 'Droitier',
-      avatarColor: 'from-orange-500 to-amber-600'
+      avatarColor: 'from-orange-500 to-amber-600',
+      photoUrl: formData.photoUrl || ''
     });
   };
 
@@ -117,6 +131,44 @@ export function WelcomeOnboarding() {
             <p className="text-[11px] text-slate-400">
               Renseignez ses informations de joueur
             </p>
+          </div>
+        </div>
+
+        {/* Photo / Avatar facultatif */}
+        <div className="flex items-center gap-3.5 p-2 bg-slate-900/80 rounded-2xl border border-slate-800">
+          <div className="relative w-12 h-12 rounded-2xl bg-gradient-to-br from-orange-500 to-amber-600 flex items-center justify-center text-white font-mono font-black text-sm shadow-md overflow-hidden shrink-0">
+            {formData.photoUrl ? (
+              <img src={formData.photoUrl} alt="Aperçu" className="w-full h-full object-cover" />
+            ) : (
+              <span>#{formData.jerseyNumber || '?'}</span>
+            )}
+          </div>
+
+          <div className="flex-1 min-w-0">
+            <div className="text-[11px] font-bold text-white mb-0.5">Photo de l'enfant (facultatif)</div>
+            <div className="flex items-center gap-2">
+              <label className="cursor-pointer px-2.5 py-1 bg-slate-800 hover:bg-slate-750 text-orange-400 hover:text-orange-300 font-bold rounded-xl text-xs flex items-center gap-1.5 border border-slate-700 active:scale-95 transition">
+                <Camera className="w-3.5 h-3.5" />
+                <span>{formData.photoUrl ? 'Changer' : 'Ajouter une photo'}</span>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handlePhotoUpload}
+                  className="hidden"
+                />
+              </label>
+
+              {formData.photoUrl && (
+                <button
+                  type="button"
+                  onClick={() => setFormData(prev => ({ ...prev, photoUrl: '' }))}
+                  className="p-1 text-slate-400 hover:text-red-400 transition"
+                  title="Supprimer la photo"
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                </button>
+              )}
+            </div>
           </div>
         </div>
 
