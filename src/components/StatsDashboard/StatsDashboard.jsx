@@ -372,6 +372,11 @@ export function StatsDashboard({ onNavigateToProgression }) {
                           {m.result}
                         </span>
                       )}
+                      {m.matchDuration && m.matchDuration !== 40 && (
+                        <span className="text-[9px] font-mono font-bold px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                          {m.matchDuration}m
+                        </span>
+                      )}
                     </div>
 
                     {/* Badge Catégorie */}

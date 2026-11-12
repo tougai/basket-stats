@@ -65,11 +65,12 @@ export function exportMatchesToExcel(player, matches = [], workouts = []) {
       const minutes = parseInt(m.minutes) || 0;
       const parsedRes = parseResult(m.result);
       const points = parseInt(m.points) || calculatePoints(m.pts2Made, m.pts3Made, m.ftMade);
-      const minPct = minutes > 0 ? Number((calculateMinPercentage(minutes, 40) * 100).toFixed(1)) + '%' : 'Pas joué';
+      const matchDuration = m.matchDuration || 40;
+      const minPct = minutes > 0 ? Number((calculateMinPercentage(minutes, matchDuration) * 100).toFixed(1)) + '%' : 'Pas joué';
       const ptsPct = (minutes > 0 && parsedRes.teamScore > 0)
         ? Number((calculatePointsPercentage(points, parsedRes.teamScore) * 100).toFixed(1)) + '%'
         : (minutes === 0 ? 'Pas joué' : '0%');
-      const va = minutes > 0 ? calculateValeurAjoutee(points, parsedRes.teamScore, minutes, 40) : 'Pas joué';
+      const va = minutes > 0 ? calculateValeurAjoutee(points, parsedRes.teamScore, minutes, matchDuration) : 'Pas joué';
       const eff = minutes > 0 ? calculateEfficiency(m) : 'Pas joué';
       const qs = minutes > 0 ? calculateQuickScore(m) : 'Pas joué';
       const cat = getCategory(qs, minutes).label;

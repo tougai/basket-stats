@@ -89,6 +89,7 @@ export function ProgressionCharts({ onNavigateToMatch }) {
       points: pts,
       quickScore: qs,
       minutes: mins,
+      matchDuration: m.matchDuration || 40,
       category: cat,
       result: m.result,
       isWin: parsed.isWin,
@@ -588,6 +589,11 @@ export function ProgressionCharts({ onNavigateToMatch }) {
                         activeDetailPoint.isWin ? 'bg-emerald-500/20 text-emerald-400' : 'bg-red-500/20 text-red-400'
                       }`}>
                         {activeDetailPoint.result}
+                      </span>
+                    )}
+                    {activeDetailPoint.matchDuration && activeDetailPoint.matchDuration !== 40 && (
+                      <span className="text-[10px] font-mono font-bold px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                        {activeDetailPoint.matchDuration}m
                       </span>
                     )}
                   </div>

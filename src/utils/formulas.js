@@ -97,8 +97,10 @@ export function calculateEfficiency(match = {}) {
 /**
  * Calcule le Quick Score
  * Formule du tableur : Points + RebTot + (AST * 2) + (STL * 2) + (DEF * 2) - PF
+ * Normalisé sur une base de 40 minutes (format standard) pour ne pas pénaliser
+ * les formats de match réduits (ex: tournois 20 min ou jeunes 32 min vs 40 min).
  */
-export function calculateQuickScore(match = {}) {
+export function calculateQuickScore(match = {}, baseDuration = 40) {
   const pts = parseInt(match.points) || calculatePoints(match.pts2Made, match.pts3Made, match.ftMade);
   const reb = parseInt(match.reb) || 0;
   const ast = parseInt(match.ast) || 0;
@@ -106,7 +108,15 @@ export function calculateQuickScore(match = {}) {
   const def = parseInt(match.def) || 0;
   const pf = parseInt(match.pf) || 0;
 
-  return pts + reb + (ast * 2) + (stl * 2) + (def * 2) - pf;
+  const rawScore = pts + reb + (ast * 2) + (stl * 2) + (def * 2) - pf;
+
+  const matchDuration = parseFloat(match.matchDuration) || parseFloat(match.duration) || baseDuration;
+  if (matchDuration <= 0 || matchDuration === baseDuration) {
+    return rawScore;
+  }
+
+  // Normalisation au format standard (40 min)
+  return Math.round(rawScore * (baseDuration / matchDuration));
 }
 
 /**

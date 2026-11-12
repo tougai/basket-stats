@@ -13,7 +13,7 @@ export function LiveSummaryBar({ match, minutes, teamScore }) {
   const quickScore = calculateQuickScore(matchWithPts);
   const efficiency = calculateEfficiency(matchWithPts);
   const category = getCategory(quickScore, minutes > 0 ? minutes : (points > 0 ? 1 : 0));
-  const valeurAjoutee = calculateValeurAjoutee(points, teamScore, minutes, match.duration || 40);
+  const valeurAjoutee = calculateValeurAjoutee(points, teamScore, minutes, match.matchDuration || match.duration || 40);
 
   return (
     <div className="bg-gradient-to-r from-slate-900 via-slate-850 to-slate-900 border border-slate-750 p-3.5 rounded-3xl shadow-xl select-none">

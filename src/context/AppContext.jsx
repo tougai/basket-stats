@@ -68,7 +68,17 @@ export function AppProvider({ children }) {
       const saved = localStorage.getItem(STORAGE_KEY_MATCHES);
       if (saved) {
         const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed)) return parsed;
+        if (Array.isArray(parsed)) {
+          // Migration automatique : injection de matchDuration pour les matchs de Quentin ou anciens matchs
+          const quentinDurations = new Map((quentinData.matches || []).map(qm => [qm.id, qm.matchDuration]));
+          return parsed.map(m => {
+            if (m.matchDuration === undefined) {
+              const dur = quentinDurations.get(m.id) || 40;
+              return { ...m, matchDuration: dur };
+            }
+            return m;
+          });
+        }
       }
     } catch (e) {
       console.error('Erreur chargement matchs', e);

@@ -15,13 +15,14 @@ export function MatchDetailModal({ match, player, onClose, onEdit }) {
   if (!match) return null;
 
   const minutes = parseInt(match.minutes) || 0;
+  const matchDuration = match.matchDuration || 40;
   const parsedRes = parseResult(match.result);
   const points = parseInt(match.points) || calculatePoints(match.pts2Made, match.pts3Made, match.ftMade);
-  const minPct = minutes > 0 ? (calculateMinPercentage(minutes, 40) * 100).toFixed(1) + '%' : 'Pas joué';
+  const minPct = minutes > 0 ? (calculateMinPercentage(minutes, matchDuration) * 100).toFixed(1) + '%' : 'Pas joué';
   const ptsPct = (minutes > 0 && parsedRes.teamScore > 0)
     ? (calculatePointsPercentage(points, parsedRes.teamScore) * 100).toFixed(1) + '%'
     : (minutes === 0 ? 'Pas joué' : '0%');
-  const va = minutes > 0 ? calculateValeurAjoutee(points, parsedRes.teamScore, minutes, 40) : 'Pas joué';
+  const va = minutes > 0 ? calculateValeurAjoutee(points, parsedRes.teamScore, minutes, matchDuration) : 'Pas joué';
   const eff = minutes > 0 ? calculateEfficiency(match) : 'Pas joué';
   const qs = minutes > 0 ? calculateQuickScore(match) : 'Pas joué';
   const cat = getCategory(qs, minutes);
@@ -31,7 +32,7 @@ export function MatchDetailModal({ match, player, onClose, onEdit }) {
     { code: 'B', name: 'Type', value: match.type },
     { code: 'C', name: 'Adversaire', value: match.opponent },
     { code: 'D', name: 'Résultat', value: match.result },
-    { code: 'E', name: 'Minutes', value: `${minutes} min` },
+    { code: 'E', name: 'Minutes jouées', value: `${minutes} min / ${matchDuration} min (${minPct})` },
     { code: 'F', name: '% min', value: minPct },
     { code: 'G', name: 'Points', value: `${points} pts`, highlight: true },
     { code: 'H', name: '% points', value: ptsPct },
@@ -43,10 +44,10 @@ export function MatchDetailModal({ match, player, onClose, onEdit }) {
     { code: 'N', name: 'DREB (Défensifs)', value: match.dreb || 0 },
     { code: 'O', name: 'AST (Passes)', value: match.ast || 0 },
     { code: 'P', name: 'STL (Interceptions)', value: match.stl || 0 },
-    { code: 'Q', name: 'DEF (Contres)', value: match.def || 0 },
+    { code: 'DEF', name: 'DEF (Contres/Ballons sauvés)', value: match.def || 0 },
     { code: 'R', name: 'PF (Fautes)', value: match.pf || 0 },
     { code: 'S', name: 'Efficiency', value: eff },
-    { code: 'T', name: 'Quick Score', value: qs, highlight: true },
+    { code: 'T', name: 'Quick Score', value: matchDuration !== 40 ? `${qs} (ajusté ${matchDuration}m)` : qs, highlight: true },
     { code: 'U', name: 'Catégorie', value: `${cat.emoji} ${cat.label}`, highlight: true },
   ];
 
