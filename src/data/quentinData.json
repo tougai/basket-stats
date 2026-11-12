@@ -625,6 +625,58 @@
   ],
   "workouts": [
     {
+      "id": "workout_quentin_2026-10-28_3pt",
+      "playerId": "player_quentin",
+      "date": "28/10/2026",
+      "title": "Tirs à 3 Points (Tour 5 spots)",
+      "category": "3 Points",
+      "made": 41,
+      "missed": 59,
+      "total": 100,
+      "percentage": 41,
+      "durationMinutes": 30,
+      "notes": "5 spots x 2 tours : Tour 1 (19/50 : 5, 2, 5, 1, 6) • Tour 2 (22/50 : 4, 3, 7, 4, 4)"
+    },
+    {
+      "id": "workout_quentin_2026-10-11_flotter",
+      "playerId": "player_quentin",
+      "date": "11/10/2026",
+      "title": "Flotteurs / Floaters",
+      "category": "Flotteurs",
+      "made": 17,
+      "missed": 13,
+      "total": 30,
+      "percentage": 56.7,
+      "durationMinutes": 15,
+      "notes": "3 séries de 10 flotteurs raquette : 7/10, 3/10, 7/10"
+    },
+    {
+      "id": "workout_quentin_2026-10-11_3pt",
+      "playerId": "player_quentin",
+      "date": "11/10/2026",
+      "title": "Tirs à 3 Points (Tour 5 spots)",
+      "category": "3 Points",
+      "made": 35,
+      "missed": 65,
+      "total": 100,
+      "percentage": 35,
+      "durationMinutes": 30,
+      "notes": "5 spots x 2 tours : Tour 1 (16/50 : 5, 2, 2, 3, 4) • Tour 2 (19/50 : 3, 3, 5, 5, 3)"
+    },
+    {
+      "id": "workout_quentin_2026-09-14_3pt",
+      "playerId": "player_quentin",
+      "date": "14/09/2026",
+      "title": "Tirs à 3 Points (Tour 5 spots)",
+      "category": "3 Points",
+      "made": 44,
+      "missed": 56,
+      "total": 100,
+      "percentage": 44,
+      "durationMinutes": 30,
+      "notes": "5 spots x 2 tours : Tour 1 (25/50 : 5, 5, 7, 5, 3) • Tour 2 (19/50 : 4, 3, 5, 5, 2)"
+    },
+    {
       "id": "workout_demo_1",
       "playerId": "player_quentin",
       "date": "08/02/2026",

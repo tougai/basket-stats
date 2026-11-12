@@ -95,7 +95,15 @@ export function AppProvider({ children }) {
       const saved = localStorage.getItem(STORAGE_KEY_WORKOUTS);
       if (saved) {
         const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed)) return parsed;
+        if (Array.isArray(parsed)) {
+          // Synchronisation automatique des nouvelles séances de Quentin
+          const existingIds = new Set(parsed.map(w => w.id));
+          const missingWorkouts = (quentinData.workouts || []).filter(w => !existingIds.has(w.id));
+          if (missingWorkouts.length > 0) {
+            return [...missingWorkouts, ...parsed];
+          }
+          return parsed;
+        }
       }
     } catch (e) {
       console.error('Erreur chargement séances', e);

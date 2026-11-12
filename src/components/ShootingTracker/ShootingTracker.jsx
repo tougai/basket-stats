@@ -6,13 +6,15 @@ import confetti from 'canvas-confetti';
 import { EditWorkoutModal } from './EditWorkoutModal';
 
 const DRILL_PRESETS = [
+  { id: '3pt_tour', label: '3 Points (Tour 5 spots)', target: 50, icon: '🔥' },
+  { id: '3pt_corner', label: '3 Points (Corners)', target: 25, icon: '🔥' },
+  { id: '3pt_wing', label: '3 Points (Ailes 45°)', target: 25, icon: '🔥' },
+  { id: '3pt_top', label: '3 Points (Axe)', target: 25, icon: '🔥' },
+  { id: 'floater', label: 'Flotteurs (Floaters)', target: 30, icon: '💫' },
   { id: 'lf', label: 'Lancers Francs', target: 20, icon: '🎯' },
   { id: 'mid_corner', label: 'Mi-distance (Corners)', target: 25, icon: '🏹' },
   { id: 'mid_wing', label: 'Mi-distance (Ailes 45°)', target: 25, icon: '🏹' },
   { id: 'mid_top', label: 'Mi-distance (Tête de raquette)', target: 25, icon: '🏹' },
-  { id: '3pt_corner', label: '3 Points (Corners)', target: 25, icon: '🔥' },
-  { id: '3pt_wing', label: '3 Points (Ailes 45°)', target: 25, icon: '🔥' },
-  { id: '3pt_top', label: '3 Points (Axe)', target: 25, icon: '🔥' },
   { id: 'free', label: 'Série Libre', target: 50, icon: '🏀' },
 ];
 
@@ -93,7 +95,13 @@ export function ShootingTracker() {
 
     saveWorkout({
       title: selectedDrill.label,
-      category: selectedDrill.id.includes('lf') ? 'Lancers Francs' : (selectedDrill.id.includes('3pt') ? '3 Points' : 'Mi-distance'),
+      category: selectedDrill.id.includes('lf')
+        ? 'Lancers Francs'
+        : (selectedDrill.id.includes('3pt')
+          ? '3 Points'
+          : (selectedDrill.id.includes('floater')
+            ? 'Flotteurs'
+            : 'Mi-distance')),
       made,
       missed,
       total: totalShots,
