@@ -625,6 +625,34 @@
   ],
   "workouts": [
     {
+      "id": "workout_quentin_2026-11-11_3pt_axe",
+      "playerId": "player_quentin",
+      "date": "11/11/2026",
+      "title": "3 Pts - Axe (90°)",
+      "category": "3 Points",
+      "spot": "Axe",
+      "made": 2,
+      "missed": 4,
+      "total": 6,
+      "percentage": 33.3,
+      "durationMinutes": 10,
+      "notes": "Entraînement : 2/6 dans l'axe"
+    },
+    {
+      "id": "workout_quentin_2026-11-11_3pt_45",
+      "playerId": "player_quentin",
+      "date": "11/11/2026",
+      "title": "3 Pts - 45° Droit",
+      "category": "3 Points",
+      "spot": "45° Droit",
+      "made": 2,
+      "missed": 5,
+      "total": 7,
+      "percentage": 28.6,
+      "durationMinutes": 10,
+      "notes": "Entraînement : 2/7 à 45°"
+    },
+    {
       "id": "workout_quentin_2026-10-28_3pt",
       "playerId": "player_quentin",
       "date": "28/10/2026",
@@ -801,32 +829,6 @@
         }
       ],
       "notes": "Ordre des spots : Corner D (9/20) • 45° D (8/20) • Axe (12/20) • 45° G (10/20) • Corner G (5/20)\nTour 1 : 25/50 (5, 5, 7, 5, 3) | Tour 2 : 19/50 (4, 3, 5, 5, 2)"
-    },
-    {
-      "id": "workout_demo_1",
-      "playerId": "player_quentin",
-      "date": "08/02/2026",
-      "title": "Série Lancers Francs",
-      "category": "Lancers Francs",
-      "made": 17,
-      "missed": 3,
-      "total": 20,
-      "percentage": 85,
-      "durationMinutes": 15,
-      "notes": "Bonne mécanique et régularité"
-    },
-    {
-      "id": "workout_demo_2",
-      "playerId": "player_quentin",
-      "date": "05/02/2026",
-      "title": "Tirs Mi-distance",
-      "category": "Mi-distance",
-      "made": 16,
-      "missed": 9,
-      "total": 25,
-      "percentage": 64,
-      "durationMinutes": 20,
-      "notes": "Rythme fluide après dribble"
     }
   ]
 }

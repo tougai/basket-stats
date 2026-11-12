@@ -62,20 +62,35 @@ export function ShootingStatsView({ workouts = [], activePlayer = {}, onSwitchTo
         });
       }
       // Cas 2 : séance avec un spot individuel
-      else if (w.spot && spotsMap[w.spot]) {
-        uniqueDates.add(w.date);
-        const m = parseInt(w.made, 10) || 0;
-        const t = parseInt(w.total, 10) || 0;
-        const pct = parseFloat(w.percentage) || (t > 0 ? Number(((m / t) * 100).toFixed(1)) : 0);
-        spotsMap[w.spot].totalMade += m;
-        spotsMap[w.spot].totalAttempted += t;
-        spotsMap[w.spot].history.push({
-          date: w.date,
-          workoutId: w.id,
-          made: m,
-          total: t,
-          pct
-        });
+      else {
+        let targetSpot = w.spot;
+        if (!targetSpot && w.title) {
+          if (w.title.includes('Axe')) targetSpot = 'Axe';
+          else if (w.title.includes('Corner D')) targetSpot = 'Corner Droit';
+          else if (w.title.includes('Corner G')) targetSpot = 'Corner Gauche';
+          else if (w.title.includes('45° D') || w.title.includes('45 D')) targetSpot = '45° Droit';
+          else if (w.title.includes('45° G') || w.title.includes('45 G')) targetSpot = '45° Gauche';
+          else if (w.title.includes('45')) targetSpot = '45° Droit';
+        }
+        if (targetSpot && (targetSpot === '45°' || targetSpot === '45')) {
+          targetSpot = '45° Droit';
+        }
+
+        if (targetSpot && spotsMap[targetSpot]) {
+          uniqueDates.add(w.date);
+          const m = parseInt(w.made, 10) || 0;
+          const t = parseInt(w.total, 10) || 0;
+          const pct = parseFloat(w.percentage) || (t > 0 ? Number(((m / t) * 100).toFixed(1)) : 0);
+          spotsMap[targetSpot].totalMade += m;
+          spotsMap[targetSpot].totalAttempted += t;
+          spotsMap[targetSpot].history.push({
+            date: w.date,
+            workoutId: w.id,
+            made: m,
+            total: t,
+            pct
+          });
+        }
       }
     });
 
@@ -634,18 +649,27 @@ export function ShootingStatsView({ workouts = [], activePlayer = {}, onSwitchTo
                         <span className="truncate">{s.name}</span>
                       </td>
 
-                      {s.history.map((h, i) => (
-                        <td key={i} className="py-2 text-center px-1">
-                          <div className={`text-[10px] font-bold ${
-                            h.pct >= 50 ? 'text-emerald-400' : h.pct >= 35 ? 'text-amber-400' : 'text-slate-400'
-                          }`}>
-                            {h.made}/{h.total}
-                          </div>
-                          <div className="text-[8px] text-slate-500 font-mono">
-                            {h.pct}%
-                          </div>
-                        </td>
-                      ))}
+                      {spotAnalytics.dates.map(d => {
+                        const h = s.history.find(item => item.date === d);
+                        return (
+                          <td key={d} className="py-2 text-center px-1">
+                            {h ? (
+                              <>
+                                <div className={`text-[10px] font-bold ${
+                                  h.pct >= 50 ? 'text-emerald-400' : h.pct >= 35 ? 'text-amber-400' : 'text-slate-400'
+                                }`}>
+                                  {h.made}/{h.total}
+                                </div>
+                                <div className="text-[8px] text-slate-500 font-mono">
+                                  {h.pct}%
+                                </div>
+                              </>
+                            ) : (
+                              <span className="text-slate-600 font-mono text-[10px]">-</span>
+                            )}
+                          </td>
+                        );
+                      })}
 
                       <td className="py-2 text-right font-bold text-white">
                         <div>{s.totalMade}/{s.totalAttempted}</div>
