@@ -4,17 +4,17 @@
   "description": "Suivi des statistiques de basketball et séances de shoots en direct",
   "icons": [
     {
-      "src": "./pwa-192x192.png",
+      "src": "./pwa-192x192.png?v=2",
       "type": "image/png",
       "sizes": "192x192"
     },
     {
-      "src": "./pwa-512x512.png",
+      "src": "./pwa-512x512.png?v=2",
       "type": "image/png",
       "sizes": "512x512"
     },
     {
-      "src": "./pwa-512x512.png",
+      "src": "./pwa-512x512.png?v=2",
       "type": "image/png",
       "sizes": "512x512",
       "purpose": "any maskable"
