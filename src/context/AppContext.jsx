@@ -96,13 +96,17 @@ export function AppProvider({ children }) {
       if (saved) {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed)) {
-          // Synchronisation automatique des nouvelles séances de Quentin
-          const existingIds = new Set(parsed.map(w => w.id));
+          // Synchronisation automatique des séances de Quentin (mise à jour des notes/spots ou ajout)
+          const quentinMap = new Map((quentinData.workouts || []).map(w => [w.id, w]));
+          const updatedExisting = parsed.map(w => {
+            if (quentinMap.has(w.id)) {
+              return { ...w, ...quentinMap.get(w.id) };
+            }
+            return w;
+          });
+          const existingIds = new Set(updatedExisting.map(w => w.id));
           const missingWorkouts = (quentinData.workouts || []).filter(w => !existingIds.has(w.id));
-          if (missingWorkouts.length > 0) {
-            return [...missingWorkouts, ...parsed];
-          }
-          return parsed;
+          return [...missingWorkouts, ...updatedExisting];
         }
       }
     } catch (e) {

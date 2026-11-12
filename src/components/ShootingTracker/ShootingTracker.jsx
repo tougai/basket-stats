@@ -345,53 +345,88 @@ export function ShootingTracker() {
               activePlayerWorkouts.map(w => (
                 <div
                   key={w.id}
-                  className="bg-slate-900/90 border border-slate-800 rounded-2xl p-3 flex items-center justify-between"
+                  className="bg-slate-900/90 border border-slate-800 rounded-2xl p-3 space-y-2.5"
                 >
-                  <div>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-bold text-white">{w.title}</span>
+                        <span className="text-[10px] text-slate-400 font-mono">{w.date}</span>
+                      </div>
+                      <div className="text-[11px] text-slate-400 mt-0.5">
+                        {w.made}/{w.total} tirs rentrés
+                        {w.durationMinutes ? ` • ${w.durationMinutes} min` : ''}
+                      </div>
+                    </div>
+
                     <div className="flex items-center gap-2">
-                      <span className="text-xs font-bold text-white">{w.title}</span>
-                      <span className="text-[10px] text-slate-400">{w.date}</span>
-                    </div>
-                    <div className="text-[11px] text-slate-400 mt-0.5">
-                      {w.made}/{w.total} tirs rentrés
-                      {w.durationMinutes ? ` • ${w.durationMinutes} min` : ''}
-                      {w.notes ? ` • "${w.notes}"` : ''}
+                      <span className={`text-xs font-black font-mono px-2 py-0.5 rounded-lg border ${
+                        w.percentage >= 70
+                          ? 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30'
+                          : w.percentage >= 50
+                          ? 'bg-amber-500/15 text-amber-400 border-amber-500/30'
+                          : 'bg-red-500/15 text-red-400 border-red-500/30'
+                      }`}>
+                        {w.percentage}%
+                      </span>
+
+                      <button
+                        type="button"
+                        onClick={() => setEditingWorkout(w)}
+                        className="text-slate-500 hover:text-orange-400 p-1 transition"
+                        title="Modifier cette séance"
+                      >
+                        <Edit2 className="w-3.5 h-3.5" />
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (window.confirm('Supprimer cette séance ?')) {
+                            deleteWorkout(w.id);
+                          }
+                        }}
+                        className="text-slate-500 hover:text-red-400 p-1 transition"
+                        title="Supprimer cette séance"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-2.5">
-                    <span className={`text-xs font-black font-mono px-2 py-0.5 rounded-lg border ${
-                      w.percentage >= 70
-                        ? 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30'
-                        : w.percentage >= 50
-                        ? 'bg-amber-500/15 text-amber-400 border-amber-500/30'
-                        : 'bg-red-500/15 text-red-400 border-red-500/30'
-                    }`}>
-                      {w.percentage}%
-                    </span>
+                  {/* Répartition visuelle par Spot (Corner Droit -> Corner Gauche) */}
+                  {Array.isArray(w.spots) && w.spots.length > 0 && (
+                    <div className="pt-2 border-t border-slate-800/80">
+                      <div className="text-[9px] font-bold uppercase tracking-wider text-slate-400 mb-1.5 flex items-center justify-between">
+                        <span>🎯 5 Spots (Corner D $\rightarrow$ Corner G) :</span>
+                        <span className="font-mono text-slate-500">2 tours / spot</span>
+                      </div>
+                      <div className="grid grid-cols-5 gap-1 text-center">
+                        {w.spots.map((s, idx) => (
+                          <div key={idx} className="bg-slate-850 p-1 rounded-xl border border-slate-800">
+                            <div className="text-[8px] text-slate-400 truncate font-semibold" title={s.name}>
+                              {s.name}
+                            </div>
+                            <div className="text-[10px] font-bold font-mono text-white mt-0.5">
+                              {s.made}/{s.total}
+                            </div>
+                            <div className={`text-[8px] font-mono font-bold ${
+                              s.pct >= 50 ? 'text-emerald-400' : s.pct >= 35 ? 'text-amber-400' : 'text-slate-400'
+                            }`}>
+                              {s.pct}%
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
 
-                    <button
-                      type="button"
-                      onClick={() => setEditingWorkout(w)}
-                      className="text-slate-500 hover:text-orange-400 p-1 transition"
-                      title="Modifier cette séance"
-                    >
-                      <Edit2 className="w-3.5 h-3.5" />
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={() => {
-                        if (window.confirm('Supprimer cette séance ?')) {
-                          deleteWorkout(w.id);
-                        }
-                      }}
-                      className="text-slate-500 hover:text-red-400 p-1 transition"
-                      title="Supprimer cette séance"
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
+                  {/* Notes / Remarques (si pas de grille de spots ou si notes additionnelles) */}
+                  {w.notes && (!Array.isArray(w.spots) || w.spots.length === 0) && (
+                    <div className="text-[10px] text-slate-300 bg-slate-850/80 border border-slate-750 px-2.5 py-1 rounded-xl leading-relaxed whitespace-pre-line">
+                      {w.notes}
+                    </div>
+                  )}
                 </div>
               ))
             )}

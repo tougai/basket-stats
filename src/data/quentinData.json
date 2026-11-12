@@ -628,14 +628,56 @@
       "id": "workout_quentin_2026-10-28_3pt",
       "playerId": "player_quentin",
       "date": "28/10/2026",
-      "title": "Tirs à 3 Points (Tour 5 spots)",
+      "title": "Tirs à 3 Points (5 spots)",
       "category": "3 Points",
       "made": 41,
       "missed": 59,
       "total": 100,
       "percentage": 41,
       "durationMinutes": 30,
-      "notes": "5 spots x 2 tours : Tour 1 (19/50 : 5, 2, 5, 1, 6) • Tour 2 (22/50 : 4, 3, 7, 4, 4)"
+      "spots": [
+        {
+          "name": "Corner Droit",
+          "tour1": 5,
+          "tour2": 4,
+          "made": 9,
+          "total": 20,
+          "pct": 45
+        },
+        {
+          "name": "45° Droit",
+          "tour1": 2,
+          "tour2": 3,
+          "made": 5,
+          "total": 20,
+          "pct": 25
+        },
+        {
+          "name": "Axe",
+          "tour1": 5,
+          "tour2": 7,
+          "made": 12,
+          "total": 20,
+          "pct": 60
+        },
+        {
+          "name": "45° Gauche",
+          "tour1": 1,
+          "tour2": 4,
+          "made": 5,
+          "total": 20,
+          "pct": 25
+        },
+        {
+          "name": "Corner Gauche",
+          "tour1": 6,
+          "tour2": 4,
+          "made": 10,
+          "total": 20,
+          "pct": 50
+        }
+      ],
+      "notes": "Ordre des spots : Corner D (9/20) • 45° D (5/20) • Axe (12/20) • 45° G (5/20) • Corner G (10/20)\nTour 1 : 19/50 (5, 2, 5, 1, 6) | Tour 2 : 22/50 (4, 3, 7, 4, 4)"
     },
     {
       "id": "workout_quentin_2026-10-11_flotter",
@@ -648,33 +690,117 @@
       "total": 30,
       "percentage": 56.7,
       "durationMinutes": 15,
-      "notes": "3 séries de 10 flotteurs raquette : 7/10, 3/10, 7/10"
+      "notes": "3 séries de 10 flotteurs dans la raquette : 7/10, 3/10, 7/10"
     },
     {
       "id": "workout_quentin_2026-10-11_3pt",
       "playerId": "player_quentin",
       "date": "11/10/2026",
-      "title": "Tirs à 3 Points (Tour 5 spots)",
+      "title": "Tirs à 3 Points (5 spots)",
       "category": "3 Points",
       "made": 35,
       "missed": 65,
       "total": 100,
       "percentage": 35,
       "durationMinutes": 30,
-      "notes": "5 spots x 2 tours : Tour 1 (16/50 : 5, 2, 2, 3, 4) • Tour 2 (19/50 : 3, 3, 5, 5, 3)"
+      "spots": [
+        {
+          "name": "Corner Droit",
+          "tour1": 5,
+          "tour2": 3,
+          "made": 8,
+          "total": 20,
+          "pct": 40
+        },
+        {
+          "name": "45° Droit",
+          "tour1": 2,
+          "tour2": 3,
+          "made": 5,
+          "total": 20,
+          "pct": 25
+        },
+        {
+          "name": "Axe",
+          "tour1": 2,
+          "tour2": 5,
+          "made": 7,
+          "total": 20,
+          "pct": 35
+        },
+        {
+          "name": "45° Gauche",
+          "tour1": 3,
+          "tour2": 5,
+          "made": 8,
+          "total": 20,
+          "pct": 40
+        },
+        {
+          "name": "Corner Gauche",
+          "tour1": 4,
+          "tour2": 3,
+          "made": 7,
+          "total": 20,
+          "pct": 35
+        }
+      ],
+      "notes": "Ordre des spots : Corner D (8/20) • 45° D (5/20) • Axe (7/20) • 45° G (8/20) • Corner G (7/20)\nTour 1 : 16/50 (5, 2, 2, 3, 4) | Tour 2 : 19/50 (3, 3, 5, 5, 3)"
     },
     {
       "id": "workout_quentin_2026-09-14_3pt",
       "playerId": "player_quentin",
       "date": "14/09/2026",
-      "title": "Tirs à 3 Points (Tour 5 spots)",
+      "title": "Tirs à 3 Points (5 spots)",
       "category": "3 Points",
       "made": 44,
       "missed": 56,
       "total": 100,
       "percentage": 44,
       "durationMinutes": 30,
-      "notes": "5 spots x 2 tours : Tour 1 (25/50 : 5, 5, 7, 5, 3) • Tour 2 (19/50 : 4, 3, 5, 5, 2)"
+      "spots": [
+        {
+          "name": "Corner Droit",
+          "tour1": 5,
+          "tour2": 4,
+          "made": 9,
+          "total": 20,
+          "pct": 45
+        },
+        {
+          "name": "45° Droit",
+          "tour1": 5,
+          "tour2": 3,
+          "made": 8,
+          "total": 20,
+          "pct": 40
+        },
+        {
+          "name": "Axe",
+          "tour1": 7,
+          "tour2": 5,
+          "made": 12,
+          "total": 20,
+          "pct": 60
+        },
+        {
+          "name": "45° Gauche",
+          "tour1": 5,
+          "tour2": 5,
+          "made": 10,
+          "total": 20,
+          "pct": 50
+        },
+        {
+          "name": "Corner Gauche",
+          "tour1": 3,
+          "tour2": 2,
+          "made": 5,
+          "total": 20,
+          "pct": 25
+        }
+      ],
+      "notes": "Ordre des spots : Corner D (9/20) • 45° D (8/20) • Axe (12/20) • 45° G (10/20) • Corner G (5/20)\nTour 1 : 25/50 (5, 5, 7, 5, 3) | Tour 2 : 19/50 (4, 3, 5, 5, 2)"
     },
     {
       "id": "workout_demo_1",
