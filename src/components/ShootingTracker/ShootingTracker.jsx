@@ -1,23 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import { useApp } from '../../context/AppContext';
 import { calculateShootingAccuracy } from '../../utils/formulas';
-import { Target, Flame, RotateCcw, Save, Trash2, CheckCircle2, XCircle, Edit2, BarChart3, Plus } from 'lucide-react';
+import { Target, Flame, RotateCcw, Save, Trash2, CheckCircle2, XCircle, Edit2, BarChart3 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { EditWorkoutModal } from './EditWorkoutModal';
 import { ShootingStatsView } from './ShootingStatsView';
-import { SpotEntryModal } from './SpotEntryModal';
 
 const DRILL_PRESETS = [
-  { id: '3pt_tour', label: '3 Points (Tour 5 spots)', target: 50, icon: '🔥' },
-  { id: '3pt_corner', label: '3 Points (Corners)', target: 25, icon: '🔥' },
-  { id: '3pt_wing', label: '3 Points (Ailes 45°)', target: 25, icon: '🔥' },
-  { id: '3pt_top', label: '3 Points (Axe)', target: 25, icon: '🔥' },
-  { id: 'floater', label: 'Flotteurs (Floaters)', target: 30, icon: '💫' },
-  { id: 'lf', label: 'Lancers Francs', target: 20, icon: '🎯' },
-  { id: 'mid_corner', label: 'Mi-distance (Corners)', target: 25, icon: '🏹' },
-  { id: 'mid_wing', label: 'Mi-distance (Ailes 45°)', target: 25, icon: '🏹' },
-  { id: 'mid_top', label: 'Mi-distance (Tête de raquette)', target: 25, icon: '🏹' },
-  { id: 'free', label: 'Série Libre', target: 50, icon: '🏀' },
+  { id: '3pt_corner_d', label: '3 Pts - Corner Droit', category: '3 Points', spot: 'Corner Droit', target: 20, icon: '🔥' },
+  { id: '3pt_wing_d', label: '3 Pts - 45° Droit', category: '3 Points', spot: '45° Droit', target: 20, icon: '🔥' },
+  { id: '3pt_top', label: '3 Pts - Axe (90°)', category: '3 Points', spot: 'Axe', target: 20, icon: '🔥' },
+  { id: '3pt_wing_g', label: '3 Pts - 45° Gauche', category: '3 Points', spot: '45° Gauche', target: 20, icon: '🔥' },
+  { id: '3pt_corner_g', label: '3 Pts - Corner Gauche', category: '3 Points', spot: 'Corner Gauche', target: 20, icon: '🔥' },
+  { id: 'floater', label: 'Flotteurs (Floaters)', category: 'Flotteurs', target: 30, icon: '💫' },
+  { id: 'lf', label: 'Lancers Francs', category: 'Lancers Francs', target: 20, icon: '🎯' },
+  { id: 'mid', label: 'Tirs Mi-distance', category: 'Mi-distance', target: 25, icon: '🏹' },
+  { id: 'free', label: 'Série Libre', category: 'Libre', target: 50, icon: '🏀' },
 ];
 
 export function ShootingTracker() {
@@ -34,10 +32,7 @@ export function ShootingTracker() {
   const [notes, setNotes] = useState('');
   const [showHistory, setShowHistory] = useState(false);
   const [editingWorkout, setEditingWorkout] = useState(null);
-  const [activeTab, setActiveTab] = useState(() => {
-    return activePlayerWorkouts && activePlayerWorkouts.length > 0 ? 'stats' : 'live';
-  });
-  const [showSpotEntryModal, setShowSpotEntryModal] = useState(false);
+  const [activeTab, setActiveTab] = useState('live'); // 'live' (Saisie séance) par défaut
 
   const accuracy = calculateShootingAccuracy(made, missed);
   const totalShots = made + missed;
@@ -101,13 +96,8 @@ export function ShootingTracker() {
 
     saveWorkout({
       title: selectedDrill.label,
-      category: selectedDrill.id.includes('lf')
-        ? 'Lancers Francs'
-        : (selectedDrill.id.includes('3pt')
-          ? '3 Points'
-          : (selectedDrill.id.includes('floater')
-            ? 'Flotteurs'
-            : 'Mi-distance')),
+      category: selectedDrill.category || 'Tir',
+      spot: selectedDrill.spot || null,
       made,
       missed,
       total: totalShots,
@@ -137,51 +127,39 @@ export function ShootingTracker() {
 
   return (
     <div className="space-y-4 pb-24 max-w-md mx-auto select-none">
-      {/* SOUS-NAVIGATION SHOOTING : BILAN & ÉVOLUTION vs TIR DIRECT */}
-      <div className="bg-slate-900/90 border border-slate-750 p-1.5 rounded-2xl flex items-center justify-between gap-1 shadow-lg sticky top-0 z-20 backdrop-blur-md">
-        <div className="flex items-center gap-1 flex-1">
-          <button
-            type="button"
-            onClick={() => setActiveTab('stats')}
-            className={`flex-1 py-2 px-3 rounded-xl text-xs font-black transition flex items-center justify-center gap-1.5 ${
-              activeTab === 'stats'
-                ? 'bg-gradient-to-r from-orange-500 to-amber-500 text-white shadow-md shadow-orange-500/25'
-                : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
-            }`}
-          >
-            <BarChart3 className="w-3.5 h-3.5" />
-            <span>Bilan & Évolution</span>
-            {activePlayerWorkouts.length > 0 && (
-              <span className={`text-[10px] font-mono px-1.5 py-0.2 rounded-full font-bold ${
-                activeTab === 'stats' ? 'bg-white/20 text-white' : 'bg-slate-800 text-orange-400'
-              }`}>
-                {activePlayerWorkouts.length}
-              </span>
-            )}
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setActiveTab('live')}
-            className={`flex-1 py-2 px-3 rounded-xl text-xs font-black transition flex items-center justify-center gap-1.5 ${
-              activeTab === 'live'
-                ? 'bg-gradient-to-r from-orange-500 to-amber-500 text-white shadow-md shadow-orange-500/25'
-                : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
-            }`}
-          >
-            <Target className="w-3.5 h-3.5" />
-            <span>Tir Direct</span>
-          </button>
-        </div>
+      {/* SOUS-NAVIGATION SHOOTING : SAISIE SÉANCE vs BILAN & ÉVOLUTION */}
+      <div className="bg-slate-900/90 border border-slate-750 p-1.5 rounded-2xl flex items-center gap-1 shadow-lg sticky top-0 z-20 backdrop-blur-md">
+        <button
+          type="button"
+          onClick={() => setActiveTab('live')}
+          className={`flex-1 py-2 px-3 rounded-xl text-xs font-black transition flex items-center justify-center gap-1.5 ${
+            activeTab === 'live'
+              ? 'bg-gradient-to-r from-orange-500 to-amber-500 text-white shadow-md shadow-orange-500/25'
+              : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+          }`}
+        >
+          <Target className="w-3.5 h-3.5" />
+          <span>Saisie Séance</span>
+        </button>
 
         <button
           type="button"
-          onClick={() => setShowSpotEntryModal(true)}
-          className="py-2 px-2.5 rounded-xl text-xs font-bold transition flex items-center gap-1 bg-orange-500/15 hover:bg-orange-500/25 text-orange-400 border border-orange-500/30 active:scale-95 shrink-0"
-          title="Saisie rapide d'une séance 5 spots"
+          onClick={() => setActiveTab('stats')}
+          className={`flex-1 py-2 px-3 rounded-xl text-xs font-black transition flex items-center justify-center gap-1.5 ${
+            activeTab === 'stats'
+              ? 'bg-gradient-to-r from-orange-500 to-amber-500 text-white shadow-md shadow-orange-500/25'
+              : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+          }`}
         >
-          <Plus className="w-3.5 h-3.5" />
-          <span className="text-[11px] font-extrabold hidden xs:inline sm:inline">5 Spots</span>
+          <BarChart3 className="w-3.5 h-3.5" />
+          <span>Bilan & Évolution</span>
+          {activePlayerWorkouts.length > 0 && (
+            <span className={`text-[10px] font-mono px-1.5 py-0.2 rounded-full font-bold ${
+              activeTab === 'stats' ? 'bg-white/20 text-white' : 'bg-slate-800 text-orange-400'
+            }`}>
+              {activePlayerWorkouts.length}
+            </span>
+          )}
         </button>
       </div>
 
@@ -190,7 +168,6 @@ export function ShootingTracker() {
           workouts={activePlayerWorkouts}
           activePlayer={activePlayer}
           onSwitchToLive={() => setActiveTab('live')}
-          onOpenSpotEntry={() => setShowSpotEntryModal(true)}
         />
       ) : (
         <>
@@ -417,21 +394,27 @@ export function ShootingTracker() {
                         <span className="text-[10px] text-slate-400 font-mono">{w.date}</span>
                       </div>
                       <div className="text-[11px] text-slate-400 mt-0.5">
-                        {w.made}/{w.total} tirs rentrés
+                        {Array.isArray(w.spots) && w.spots.length > 0 ? (
+                          <span>5 spots • 20 tirs/spot (100 tirs)</span>
+                        ) : (
+                          <span>{w.made}/{w.total} tirs rentrés</span>
+                        )}
                         {w.durationMinutes ? ` • ${w.durationMinutes} min` : ''}
                       </div>
                     </div>
 
                     <div className="flex items-center gap-2">
-                      <span className={`text-xs font-black font-mono px-2 py-0.5 rounded-lg border ${
-                        w.percentage >= 70
-                          ? 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30'
-                          : w.percentage >= 50
-                          ? 'bg-amber-500/15 text-amber-400 border-amber-500/30'
-                          : 'bg-red-500/15 text-red-400 border-red-500/30'
-                      }`}>
-                        {w.percentage}%
-                      </span>
+                      {(!Array.isArray(w.spots) || w.spots.length === 0) && (
+                        <span className={`text-xs font-black font-mono px-2 py-0.5 rounded-lg border ${
+                          w.percentage >= 70
+                            ? 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30'
+                            : w.percentage >= 50
+                            ? 'bg-amber-500/15 text-amber-400 border-amber-500/30'
+                            : 'bg-red-500/15 text-red-400 border-red-500/30'
+                        }`}>
+                          {w.percentage}%
+                        </span>
+                      )}
 
                       <button
                         type="button"
@@ -504,14 +487,6 @@ export function ShootingTracker() {
         <EditWorkoutModal
           workout={editingWorkout}
           onClose={() => setEditingWorkout(null)}
-        />
-      )}
-
-      {/* MODAL SAISIE DIRECTE 5 SPOTS */}
-      {showSpotEntryModal && (
-        <SpotEntryModal
-          onClose={() => setShowSpotEntryModal(false)}
-          onSuccess={() => setActiveTab('stats')}
         />
       )}
     </div>

@@ -819,7 +819,7 @@
       "id": "workout_demo_2",
       "playerId": "player_quentin",
       "date": "05/02/2026",
-      "title": "Tirs Mi-distance Aile droite",
+      "title": "Tirs Mi-distance",
       "category": "Mi-distance",
       "made": 16,
       "missed": 9,
@@ -827,19 +827,6 @@
       "percentage": 64,
       "durationMinutes": 20,
       "notes": "Rythme fluide après dribble"
-    },
-    {
-      "id": "workout_demo_3",
-      "playerId": "player_quentin",
-      "date": "02/02/2026",
-      "title": "Tirs à 3 Points (Corners)",
-      "category": "3 Points",
-      "made": 14,
-      "missed": 11,
-      "total": 25,
-      "percentage": 56,
-      "durationMinutes": 25,
-      "notes": "Bon arc sur le tir"
     }
   ]
 }
