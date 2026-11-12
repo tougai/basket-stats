@@ -24,13 +24,15 @@ export function EditWorkoutModal({ workout, onClose }) {
 
     updateWorkout(workout.id, {
       title: title.trim() || 'Séance de shoot',
+      category: workout.category || (title.includes('3') ? '3 Points' : 'Mi-distance'),
       date: date.trim() || new Date().toLocaleDateString('fr-FR'),
       made: parseInt(made) || 0,
       missed: parseInt(missed) || 0,
       total,
       percentage,
       durationMinutes: parseInt(durationMinutes) || 0,
-      notes: notes.trim()
+      notes: notes.trim(),
+      spots: workout.spots || []
     });
 
     onClose();

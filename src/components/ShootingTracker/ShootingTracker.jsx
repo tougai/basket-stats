@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useApp } from '../../context/AppContext';
 import { calculateShootingAccuracy } from '../../utils/formulas';
-import { Target, Flame, RotateCcw, Save, Trash2, Calendar, Clock, Award, CheckCircle2, XCircle, Edit2 } from 'lucide-react';
+import { Target, Flame, RotateCcw, Save, Trash2, CheckCircle2, XCircle, Edit2, BarChart3, Plus } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { EditWorkoutModal } from './EditWorkoutModal';
+import { ShootingStatsView } from './ShootingStatsView';
+import { SpotEntryModal } from './SpotEntryModal';
 
 const DRILL_PRESETS = [
   { id: '3pt_tour', label: '3 Points (Tour 5 spots)', target: 50, icon: '🔥' },
@@ -32,6 +34,10 @@ export function ShootingTracker() {
   const [notes, setNotes] = useState('');
   const [showHistory, setShowHistory] = useState(false);
   const [editingWorkout, setEditingWorkout] = useState(null);
+  const [activeTab, setActiveTab] = useState(() => {
+    return activePlayerWorkouts && activePlayerWorkouts.length > 0 ? 'stats' : 'live';
+  });
+  const [showSpotEntryModal, setShowSpotEntryModal] = useState(false);
 
   const accuracy = calculateShootingAccuracy(made, missed);
   const totalShots = made + missed;
@@ -131,7 +137,64 @@ export function ShootingTracker() {
 
   return (
     <div className="space-y-4 pb-24 max-w-md mx-auto select-none">
-      {/* 1. SÉLECTEUR D'ATELIER DE SHOOT */}
+      {/* SOUS-NAVIGATION SHOOTING : BILAN & ÉVOLUTION vs TIR DIRECT */}
+      <div className="bg-slate-900/90 border border-slate-750 p-1.5 rounded-2xl flex items-center justify-between gap-1 shadow-lg sticky top-0 z-20 backdrop-blur-md">
+        <div className="flex items-center gap-1 flex-1">
+          <button
+            type="button"
+            onClick={() => setActiveTab('stats')}
+            className={`flex-1 py-2 px-3 rounded-xl text-xs font-black transition flex items-center justify-center gap-1.5 ${
+              activeTab === 'stats'
+                ? 'bg-gradient-to-r from-orange-500 to-amber-500 text-white shadow-md shadow-orange-500/25'
+                : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+            }`}
+          >
+            <BarChart3 className="w-3.5 h-3.5" />
+            <span>Bilan & Évolution</span>
+            {activePlayerWorkouts.length > 0 && (
+              <span className={`text-[10px] font-mono px-1.5 py-0.2 rounded-full font-bold ${
+                activeTab === 'stats' ? 'bg-white/20 text-white' : 'bg-slate-800 text-orange-400'
+              }`}>
+                {activePlayerWorkouts.length}
+              </span>
+            )}
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setActiveTab('live')}
+            className={`flex-1 py-2 px-3 rounded-xl text-xs font-black transition flex items-center justify-center gap-1.5 ${
+              activeTab === 'live'
+                ? 'bg-gradient-to-r from-orange-500 to-amber-500 text-white shadow-md shadow-orange-500/25'
+                : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+            }`}
+          >
+            <Target className="w-3.5 h-3.5" />
+            <span>Tir Direct</span>
+          </button>
+        </div>
+
+        <button
+          type="button"
+          onClick={() => setShowSpotEntryModal(true)}
+          className="py-2 px-2.5 rounded-xl text-xs font-bold transition flex items-center gap-1 bg-orange-500/15 hover:bg-orange-500/25 text-orange-400 border border-orange-500/30 active:scale-95 shrink-0"
+          title="Saisie rapide d'une séance 5 spots"
+        >
+          <Plus className="w-3.5 h-3.5" />
+          <span className="text-[11px] font-extrabold hidden xs:inline sm:inline">5 Spots</span>
+        </button>
+      </div>
+
+      {activeTab === 'stats' ? (
+        <ShootingStatsView
+          workouts={activePlayerWorkouts}
+          activePlayer={activePlayer}
+          onSwitchToLive={() => setActiveTab('live')}
+          onOpenSpotEntry={() => setShowSpotEntryModal(true)}
+        />
+      ) : (
+        <>
+          {/* 1. SÉLECTEUR D'ATELIER DE SHOOT */}
       <div className="bg-slate-850/80 border border-slate-750 p-3.5 rounded-3xl shadow-sm">
         <div className="flex items-center justify-between mb-2">
           <span className="text-[11px] font-bold uppercase tracking-wider text-orange-400 flex items-center gap-1.5">
@@ -398,7 +461,7 @@ export function ShootingTracker() {
                   {Array.isArray(w.spots) && w.spots.length > 0 && (
                     <div className="pt-2 border-t border-slate-800/80">
                       <div className="text-[9px] font-bold uppercase tracking-wider text-slate-400 mb-1.5 flex items-center justify-between">
-                        <span>🎯 5 Spots (Corner D $\rightarrow$ Corner G) :</span>
+                        <span>🎯 5 Spots (Corner D → Corner G) :</span>
                         <span className="font-mono text-slate-500">2 tours / spot</span>
                       </div>
                       <div className="grid grid-cols-5 gap-1 text-center">
@@ -433,12 +496,22 @@ export function ShootingTracker() {
           </div>
         )}
       </div>
+        </>
+      )}
 
       {/* MODAL MODIFICATION SÉANCE */}
       {editingWorkout && (
         <EditWorkoutModal
           workout={editingWorkout}
           onClose={() => setEditingWorkout(null)}
+        />
+      )}
+
+      {/* MODAL SAISIE DIRECTE 5 SPOTS */}
+      {showSpotEntryModal && (
+        <SpotEntryModal
+          onClose={() => setShowSpotEntryModal(false)}
+          onSuccess={() => setActiveTab('stats')}
         />
       )}
     </div>
