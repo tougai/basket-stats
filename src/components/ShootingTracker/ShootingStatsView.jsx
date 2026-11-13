@@ -650,23 +650,27 @@ export function ShootingStatsView({ workouts = [], activePlayer = {}, onSwitchTo
                       </td>
 
                       {spotAnalytics.dates.map(d => {
-                        const h = s.history.find(item => item.date === d);
+                        const items = s.history.filter(item => item.date === d);
+                        if (items.length > 0) {
+                          const m = items.reduce((acc, it) => acc + (parseInt(it.made, 10) || 0), 0);
+                          const t = items.reduce((acc, it) => acc + (parseInt(it.total, 10) || 0), 0);
+                          const pct = t > 0 ? Number(((m / t) * 100).toFixed(1)) : 0;
+                          return (
+                            <td key={d} className="py-2 text-center px-1">
+                              <div className={`text-[10px] font-bold ${
+                                pct >= 50 ? 'text-emerald-400' : pct >= 35 ? 'text-amber-400' : 'text-slate-400'
+                              }`}>
+                                {m}/{t}
+                              </div>
+                              <div className="text-[8px] text-slate-500 font-mono">
+                                {pct}%
+                              </div>
+                            </td>
+                          );
+                        }
                         return (
                           <td key={d} className="py-2 text-center px-1">
-                            {h ? (
-                              <>
-                                <div className={`text-[10px] font-bold ${
-                                  h.pct >= 50 ? 'text-emerald-400' : h.pct >= 35 ? 'text-amber-400' : 'text-slate-400'
-                                }`}>
-                                  {h.made}/{h.total}
-                                </div>
-                                <div className="text-[8px] text-slate-500 font-mono">
-                                  {h.pct}%
-                                </div>
-                              </>
-                            ) : (
-                              <span className="text-slate-600 font-mono text-[10px]">-</span>
-                            )}
+                            <span className="text-slate-600 font-mono text-[10px]">-</span>
                           </td>
                         );
                       })}

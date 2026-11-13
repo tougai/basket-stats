@@ -96,8 +96,12 @@ export function AppProvider({ children }) {
       if (saved) {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed)) {
-          // Filtrer les anciennes séances de février (workout_demo_1, workout_demo_2 ou dates en /02/2026)
-          const filtered = parsed.filter(w => !w.id?.startsWith('workout_demo_') && !w.date?.includes('/02/2026'));
+          // Filtrer les anciennes séances de février ET les anciennes séances multi-spots découpées
+          const filtered = parsed.filter(w => (
+            !w.id?.startsWith('workout_demo_') &&
+            !w.date?.includes('/02/2026') &&
+            (!Array.isArray(w.spots) || w.spots.length === 0)
+          ));
           // Synchronisation automatique des séances de Quentin (mise à jour des notes/spots ou ajout)
           const quentinMap = new Map((quentinData.workouts || []).map(w => [w.id, w]));
           const updatedExisting = filtered.map(w => {
